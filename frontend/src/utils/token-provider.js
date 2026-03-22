@@ -1,7 +1,7 @@
 const tokenProvider = () => {
   let refreshPromise = null;
 
-  const getRefreshedToken = () => {
+  const getRefreshedToken = async () => {
     if (refreshPromise) {
       return refreshPromise;
     }
@@ -13,28 +13,26 @@ const tokenProvider = () => {
       credentials: "include",
     });
 
-    refreshPromise = fetch(request)
-      .then((response) => {
+    refreshPromise = (async () => {
+      try {
+        const response = await fetch(request);
         if (response.status !== 200) {
           removeToken();
           return false;
         }
-        return response.json();
-      })
-      .then(({ data }) => {
+        const { data } = await response.json();
         if (data && data.token) {
           setToken(data.token);
           return true;
         }
         return false;
-      })
-      .catch(() => {
+      } catch {
         removeToken();
         return false;
-      })
-      .finally(() => {
+      } finally {
         refreshPromise = null;
-      });
+      }
+    })();
 
     return refreshPromise;
   };

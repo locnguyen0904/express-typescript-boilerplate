@@ -1,3 +1,5 @@
+import '@/middlewares/http-logger.middleware';
+
 import { IncomingMessage } from 'http';
 
 import pinoHttp from 'pino-http';
@@ -5,8 +7,7 @@ import pinoHttp from 'pino-http';
 describe('HttpLogger Middleware', () => {
   let autoLoggingFn: (req: IncomingMessage) => boolean;
 
-  beforeAll(async () => {
-    await import('@/middlewares/http-logger.middleware');
+  beforeAll(() => {
     const calls = (pinoHttp as jest.Mock).mock.calls;
     const config = calls[0][0] as {
       autoLogging: { ignore: (req: IncomingMessage) => boolean };

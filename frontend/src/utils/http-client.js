@@ -4,13 +4,13 @@ import * as fetchUtils from "./fetch";
 import tokenProvider from "./token-provider";
 
 const httpClient = async (url, options = {}) => {
-  if (!options.headers) {
-    options.headers = new Headers({ Accept: "application/json" });
-  }
+  const headers = options.headers
+    ? new Headers(options.headers)
+    : new Headers({ Accept: "application/json" });
 
   const token = tokenProvider.getToken();
   if (!token) {
-    return fetchUtils.fetchJson(url, options);
+    return fetchUtils.fetchJson(url, { ...options, headers });
   }
 
   let needsRefresh = false;
@@ -26,16 +26,13 @@ const httpClient = async (url, options = {}) => {
   if (needsRefresh) {
     const gotFreshToken = await tokenProvider.getRefreshedToken();
     if (gotFreshToken) {
-      options.headers.set(
-        "Authorization",
-        `Bearer ${tokenProvider.getToken()}`,
-      );
+      headers.set("Authorization", `Bearer ${tokenProvider.getToken()}`);
     }
   } else {
-    options.headers.set("Authorization", `Bearer ${token}`);
+    headers.set("Authorization", `Bearer ${token}`);
   }
 
-  return fetchUtils.fetchJson(url, options);
+  return fetchUtils.fetchJson(url, { ...options, headers });
 };
 
 export default httpClient;
