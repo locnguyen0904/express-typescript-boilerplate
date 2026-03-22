@@ -200,4 +200,4 @@ Brief description of changes.
 
 ## Questions?
 
-Check [CLAUDE.md](CLAUDE.md) for AI-assisted development guidelines.
+Review the other documentation in the `docs/` directory for further technical assistance.

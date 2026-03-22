@@ -134,7 +134,7 @@ npm run generate                  # Generate new API module (Plop)
 
 | Document                                     | Description                      |
 | -------------------------------------------- | -------------------------------- |
-| [CLAUDE.md](CLAUDE.md)                       | AI coding assistant instructions |
+
 | [CONTRIBUTING.md](CONTRIBUTING.md)           | Git flow, code standards         |
 | [docs/SETUP.md](docs/SETUP.md)               | Detailed development setup       |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Design decisions                 |

@@ -4,7 +4,7 @@
   "main": "dist/server.js",
   "scripts": {
     "start": "node --import ./dist/instrumentation.js dist/server.js",
-    "dev": "tsx watch --import ./src/instrumentation.ts src/server.ts",
+    "dev": "tsx watch --clear-screen=false --import ./src/instrumentation.ts src/server.ts",
     "prebuild": "rimraf dist",
     "build": "tsc && tsc-alias",
     "test": "jest --runInBand --silent",

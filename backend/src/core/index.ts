@@ -1,8 +1,9 @@
 // Base
-export { BaseDocument } from './base-document.core';
+export type { BaseDocument } from './base-document.core';
 
 // Repository
-export { LeanDoc, Repository } from './repository.core';
+export type { LeanDoc } from './repository.core';
+export { Repository } from './repository.core';
 
 // Errors
 export {

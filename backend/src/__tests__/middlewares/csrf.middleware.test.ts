@@ -1,5 +1,10 @@
 import { doubleCsrf } from 'csrf-csrf';
 
+import {
+  doubleCsrfProtection,
+  generateCsrfToken,
+} from '@/middlewares/csrf.middleware';
+
 // Mock doubleCsrf before importing the middleware
 jest.mock('csrf-csrf', () => ({
   doubleCsrf: jest.fn().mockReturnValue({
@@ -16,21 +21,19 @@ describe('CSRF Middleware', () => {
   let doubleCsrfMock: jest.Mock;
   let skipCsrfProtection: (req: MinimalRequest) => boolean;
 
-  beforeAll(async () => {
-    // Import the middleware so it triggers the doubleCsrf call
-    await import('@/middlewares/csrf.middleware');
+  beforeAll(() => {
     doubleCsrfMock = doubleCsrf as jest.Mock;
+
     const config = doubleCsrfMock.mock.calls[0][0] as {
       skipCsrfProtection: (req: MinimalRequest) => boolean;
     };
+
     skipCsrfProtection = config.skipCsrfProtection;
   });
 
-  it('should export doubleCsrfProtection and generateCsrfToken', async () => {
-    const { doubleCsrfProtection: protection, generateCsrfToken: tokenGen } =
-      await import('@/middlewares/csrf.middleware');
-    expect(protection).toBeDefined();
-    expect(tokenGen).toBeDefined();
+  it('should export doubleCsrfProtection and generateCsrfToken', () => {
+    expect(doubleCsrfProtection).toBeDefined();
+    expect(generateCsrfToken).toBeDefined();
   });
 
   describe('skipCsrfProtection logic', () => {

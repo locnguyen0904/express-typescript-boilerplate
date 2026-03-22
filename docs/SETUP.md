@@ -300,4 +300,3 @@ npm test -- --testPathPattern=user.service
 
 1. Read [CONTRIBUTING.md](../CONTRIBUTING.md) for Git workflow
 2. Read [ARCHITECTURE.md](ARCHITECTURE.md) for design decisions
-3. Check [CLAUDE.md](../CLAUDE.md) for AI-assisted development

@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto';
 
+import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import { inject, singleton } from 'tsyringe';
 
@@ -36,7 +37,6 @@ export default class AuthService {
     password: string
   ): Promise<boolean> {
     if (!user.password) return false;
-    const argon2 = await import('argon2');
     return argon2.verify(user.password, password);
   }
 

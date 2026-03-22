@@ -2,13 +2,15 @@ import { fetchUtils } from "react-admin";
 
 import { stringify } from "query-string";
 
+const { flattenObject } = fetchUtils;
+
 export default (apiUrl, httpClient = fetchUtils.fetchJson) => ({
   getList: (resource, params) => {
     const { page, perPage } = params.pagination;
     const { field, order } = params.sort;
     const _field = field === "id" ? "_id" : field;
     const query = {
-      ...fetchUtils.flattenObject(params.filter),
+      ...flattenObject(params.filter),
       sort: order === "DESC" ? `-${_field}` : _field,
       page: page,
       limit: perPage,
@@ -16,7 +18,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => ({
     const url = `${apiUrl}/${resource}?${stringify(query)}`;
 
     return httpClient(url).then(({ json }) => ({
-      data: json.data.map((resource) => ({ ...resource, id: resource._id })),
+      data: json.data.map((record) => ({ ...record, id: record._id })),
       total: json.total,
     }));
   },
@@ -32,7 +34,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => ({
     };
     const url = `${apiUrl}/${resource}?${stringify(query)}`;
     return httpClient(url).then(({ json }) => ({
-      data: json.data.map((resource) => ({ ...resource, id: resource._id })),
+      data: json.data.map((record) => ({ ...record, id: record._id })),
       total: json.total,
     }));
   },
@@ -53,7 +55,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => ({
     const url = `${apiUrl}/${resource}?${stringify(query)}`;
 
     return httpClient(url).then(({ json }) => ({
-      data: json.data.map((resource) => ({ ...resource, id: resource._id })),
+      data: json.data.map((record) => ({ ...record, id: record._id })),
       total: json.total,
     }));
   },
@@ -76,17 +78,13 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => ({
 
   updateMany: (resource, params) => {
     return Promise.all(
-      params.ids.map((id) =>
-        httpClient(`${apiUrl}/${resource}/${id}`, {
+      params.ids.map((id) => {
+        const { id: _dataId, _id, ...data } = params.data;
+        return httpClient(`${apiUrl}/${resource}/${id}`, {
           method: "PUT",
-          body: JSON.stringify(
-            (() => {
-              const { id: dataId, _id, ...data } = params.data;
-              return data;
-            })(),
-          ),
-        }),
-      ),
+          body: JSON.stringify(data),
+        });
+      }),
     ).then((responses) => ({
       data: responses.map((response) => ({
         ...response.json.data,
