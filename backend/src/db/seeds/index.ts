@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import mongoose from 'mongoose';
 
 import User from '@/api/users/user.model';
