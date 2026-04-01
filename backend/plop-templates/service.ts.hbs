@@ -1,16 +1,14 @@
 import { PaginateResult } from 'mongoose';
-import { inject, singleton } from 'tsyringe';
 
 import { RedisService } from '@/services';
 
 import { I{{pascalCase name}} } from './{{kebabCase name}}.model';
 import { {{pascalCase name}}Repository } from './{{kebabCase name}}.repository';
 
-@singleton()
 export default class {{pascalCase name}}Service {
   constructor(
-    @inject({{pascalCase name}}Repository) private readonly {{camelCase name}}Repository: {{pascalCase name}}Repository,
-    @inject(RedisService) private readonly redis: RedisService
+    private readonly {{camelCase name}}Repository: {{pascalCase name}}Repository,
+    private readonly redis: RedisService
   ) {}
 
   private async invalidateListCache() {

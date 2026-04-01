@@ -1,12 +1,9 @@
-import { inject, singleton } from 'tsyringe';
-
 import RedisService from './redis.service';
 
 const PREFIX = 'token:blacklist:';
 
-@singleton()
 export default class TokenBlacklistService {
-  constructor(@inject(RedisService) private readonly redis: RedisService) {}
+  constructor(private readonly redis: RedisService) {}
 
   async revoke(jti: string, ttlSeconds: number): Promise<void> {
     if (!this.redis.isConnected || ttlSeconds <= 0) return;

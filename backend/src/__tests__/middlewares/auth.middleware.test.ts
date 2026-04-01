@@ -1,34 +1,29 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { container } from 'tsyringe';
 
 import { config } from '@/config';
+import * as container from '@/container';
 import { ForbiddenError, UnAuthorizedError } from '@/core';
 import { authorize, isAuth } from '@/middlewares';
-import TokenBlacklistService from '@/services/token-blacklist.service';
 
-jest.mock('tsyringe', () => ({
-  container: { resolve: jest.fn() },
-  singleton: () => (target: unknown) => target,
-  inject: () => () => undefined,
-  injectable: () => (target: unknown) => target,
+jest.mock('@/container', () => ({
+  tokenBlacklistService: {
+    revoke: jest.fn(),
+    isRevoked: jest.fn(),
+  },
 }));
 
 jest.mock('jsonwebtoken');
+
+const mockBlacklist = jest.mocked(container).tokenBlacklistService;
 
 describe('Auth Middleware', () => {
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
   let mockNext: jest.MockedFunction<NextFunction>;
 
-  const mockBlacklist = {
-    revoke: jest.fn(),
-    isRevoked: jest.fn(),
-  };
-
   beforeEach(() => {
     jest.clearAllMocks();
-    (container.resolve as jest.Mock).mockReturnValue(mockBlacklist);
     mockBlacklist.isRevoked.mockResolvedValue(false);
 
     mockRequest = { headers: {} };
@@ -87,7 +82,6 @@ describe('Auth Middleware', () => {
 
       await isAuth(mockRequest as Request, mockResponse as Response, mockNext);
 
-      expect(container.resolve).toHaveBeenCalledWith(TokenBlacklistService);
       expect(mockBlacklist.isRevoked).toHaveBeenCalledWith('revoked-jti');
       expect(mockNext).toHaveBeenCalledWith(expect.any(UnAuthorizedError));
     });

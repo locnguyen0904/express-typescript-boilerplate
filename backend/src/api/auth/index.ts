@@ -2,14 +2,13 @@ import './auth.doc';
 
 import { Router } from 'express';
 import validate from 'express-zod-safe';
-import { container } from 'tsyringe';
 
-import AuthController from '@/api/auth/auth.controller';
 import { loginSchema } from '@/api/auth/auth.validation';
+import { authController } from '@/container';
 import { authLimiter } from '@/middlewares';
 
 const router = Router();
-const controller = container.resolve(AuthController);
+const controller = authController;
 
 router.post(
   '/login',

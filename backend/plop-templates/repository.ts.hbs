@@ -1,10 +1,7 @@
-import { singleton } from 'tsyringe';
-
 import { Repository } from '@/core';
 
 import {{pascalCase name}}, { I{{pascalCase name}} } from './{{kebabCase name}}.model';
 
-@singleton()
 export class {{pascalCase name}}Repository extends Repository<I{{pascalCase name}}> {
   constructor() {
     super({{pascalCase name}});

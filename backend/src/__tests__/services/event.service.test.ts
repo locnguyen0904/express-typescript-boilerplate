@@ -1,5 +1,3 @@
-import 'reflect-metadata';
-
 import { EventEmitter } from 'events';
 
 import EventService, { EventNames } from '@/services/event.service';

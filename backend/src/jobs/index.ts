@@ -1,8 +1,7 @@
 import { Queue, Worker } from 'bullmq';
 import IORedis, { RedisOptions } from 'ioredis';
-import { container } from 'tsyringe';
 
-import { RedisService } from '@/services';
+import { redisService } from '@/container';
 
 import { createEmailQueue } from './queues/email.queue';
 import { closeEmailWorker, createEmailWorker } from './workers/email.worker';
@@ -17,8 +16,6 @@ export function getRedisConnection(): IORedis | null {
 }
 
 export async function initializeJobs(): Promise<void> {
-  const redisService = container.resolve(RedisService);
-
   if (!redisService.isConnected || !redisService.instance) {
     console.warn('Redis not connected, job queues disabled');
     return;

@@ -1,10 +1,7 @@
-import { singleton } from 'tsyringe';
-
 import { Repository } from '@/core';
 
 import User, { IUser } from './user.model';
 
-@singleton()
 export class UserRepository extends Repository<IUser> {
   constructor() {
     super(User);

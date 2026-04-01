@@ -1,15 +1,11 @@
 import { Request, Response } from 'express';
-import { inject, singleton } from 'tsyringe';
 
 import { CREATED, LIST, NotFoundError, OK } from '@/core';
 
 import ExampleService from './example.service';
 
-@singleton()
 export default class ExampleController {
-  constructor(
-    @inject(ExampleService) private readonly exampleService: ExampleService
-  ) {}
+  constructor(private readonly exampleService: ExampleService) {}
 
   async create(req: Request, res: Response): Promise<void> {
     const example = await this.exampleService.create(req.body);
