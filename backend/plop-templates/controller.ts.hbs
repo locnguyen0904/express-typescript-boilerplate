@@ -1,13 +1,11 @@
 import { Request, Response } from 'express';
-import { inject, singleton } from 'tsyringe';
 
 import { CREATED, LIST, NotFoundError, OK } from '@/core';
 
 import {{pascalCase name}}Service from './{{kebabCase name}}.service';
 
-@singleton()
 export default class {{pascalCase name}}Controller {
-  constructor(@inject({{pascalCase name}}Service) private readonly {{camelCase name}}Service: {{pascalCase name}}Service) {}
+  constructor(private readonly {{camelCase name}}Service: {{pascalCase name}}Service) {}
 
   async create(req: Request, res: Response): Promise<void> {
     const {{camelCase name}} = await this.{{camelCase name}}Service.create(req.body);

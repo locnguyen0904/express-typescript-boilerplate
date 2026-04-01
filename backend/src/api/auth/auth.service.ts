@@ -2,7 +2,6 @@ import { randomUUID } from 'crypto';
 
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
-import { inject, singleton } from 'tsyringe';
 
 import { IUser } from '@/api/users/user.model';
 import UserService from '@/api/users/user.service';
@@ -13,11 +12,10 @@ import TokenBlacklistService from '@/services/token-blacklist.service';
 
 import { AuthTokens } from './auth.interface';
 
-@singleton()
 export default class AuthService {
   constructor(
-    @inject(UserService) private userService: UserService,
-    @inject(TokenBlacklistService) private tokenBlacklist: TokenBlacklistService
+    private userService: UserService,
+    private tokenBlacklist: TokenBlacklistService
   ) {}
 
   async loginWithEmailAndPassword(

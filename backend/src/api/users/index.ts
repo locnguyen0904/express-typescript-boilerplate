@@ -2,16 +2,15 @@ import './user.doc';
 
 import { Router } from 'express';
 import validate from 'express-zod-safe';
-import { container } from 'tsyringe';
 
-import UserController from '@/api/users/user.controller';
 import { idParamSchema, listQuerySchema } from '@/common';
+import { userController } from '@/container';
 import { authorize, isAuth } from '@/middlewares';
 
 import { createUserSchema, updateUserSchema } from './user.validation';
 
 const router = Router();
-const controller = container.resolve(UserController);
+const controller = userController;
 
 router.get(
   '/',

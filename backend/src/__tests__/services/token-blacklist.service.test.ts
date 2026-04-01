@@ -1,5 +1,3 @@
-import 'reflect-metadata';
-
 import RedisService from '@/services/redis.service';
 import TokenBlacklistService from '@/services/token-blacklist.service';
 

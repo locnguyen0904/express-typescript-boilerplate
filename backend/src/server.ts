@@ -1,14 +1,11 @@
-import 'reflect-metadata';
-
 import http from 'http';
 
-import { container } from 'tsyringe';
-
 import config from '@/config/env.config';
+import { redisService } from '@/container';
 
 import app from './app';
 import { initializeJobs, shutdownJobs } from './jobs';
-import { logger, mongoose, RedisService } from './services';
+import { logger, mongoose } from './services';
 
 const PORT = config.port || 3000;
 const SHUTDOWN_TIMEOUT = 30000;
@@ -31,7 +28,7 @@ async function gracefulShutdown(
     await Promise.all([
       shutdownJobs(),
       mongoose.disconnectDB(),
-      container.resolve(RedisService).disconnect(),
+      redisService.disconnect(),
     ]);
 
     logger.info('All connections closed gracefully');
@@ -68,7 +65,7 @@ function initGracefulShutdown(server: http.Server): void {
 async function bootstrap(): Promise<void> {
   try {
     await mongoose.connectDB();
-    await container.resolve(RedisService).connect();
+    await redisService.connect();
     await initializeJobs();
 
     const server = http.createServer(app);

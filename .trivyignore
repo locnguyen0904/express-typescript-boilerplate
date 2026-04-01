@@ -35,3 +35,6 @@ CVE-2026-27903
 
 # minimatch 10.1.2 / 9.x / 5.x / 3.x - DoS via catastrophic backtracking in glob expressions (in npm internals)
 CVE-2026-27904
+
+# picomatch 4.0.3 - ReDoS via crafted extglob patterns (transitive dev dependency, not runtime)
+CVE-2026-33671

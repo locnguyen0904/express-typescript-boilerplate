@@ -1,11 +1,10 @@
-import { container } from 'tsyringe';
-
+import { eventService } from '@/container';
 import { logger } from '@/services';
-import EventService, { EventNames } from '@/services/event.service';
+import { EventNames } from '@/services/event.service';
 
 import { IUser } from './user.model';
 
-const events = container.resolve(EventService);
+const events = eventService;
 
 /**
  * User Created Event Handler

@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { container } from 'tsyringe';
 
 import { config } from '@/config';
+import { tokenBlacklistService } from '@/container';
 import { ForbiddenError, UnAuthorizedError } from '@/core';
-import TokenBlacklistService from '@/services/token-blacklist.service';
 
 interface TokenPayload {
   sub: string;
@@ -31,8 +30,7 @@ export const isAuth = async (
 
     // Check if token has been revoked
     if (payload.jti) {
-      const blacklist = container.resolve(TokenBlacklistService);
-      if (await blacklist.isRevoked(payload.jti)) {
+      if (await tokenBlacklistService.isRevoked(payload.jti)) {
         return next(new UnAuthorizedError('Token has been revoked'));
       }
     }

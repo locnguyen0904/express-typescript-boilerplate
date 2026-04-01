@@ -1,13 +1,11 @@
 import { Request, Response } from 'express';
-import { inject, singleton } from 'tsyringe';
 
 import AuthService from '@/api/auth/auth.service';
 import { SuccessResponse, UnAuthorizedError } from '@/core';
 import { decrypt, encrypt } from '@/helpers/crypto.helper';
 
-@singleton()
 export default class AuthController {
-  constructor(@inject(AuthService) private authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
   async login(req: Request, res: Response) {
     const { email, password } = req.body;

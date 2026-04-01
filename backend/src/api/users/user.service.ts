@@ -1,15 +1,12 @@
-import { inject, singleton } from 'tsyringe';
-
 import { IUser } from '@/api/users/user.model';
 import { UserRepository } from '@/api/users/user.repository';
 import { BadRequestError, NotFoundError } from '@/core';
 import EventService from '@/services/event.service';
 
-@singleton()
 export default class UserService {
   constructor(
-    @inject(UserRepository) private readonly userRepository: UserRepository,
-    @inject(EventService) private readonly eventService: EventService
+    private readonly userRepository: UserRepository,
+    private readonly eventService: EventService
   ) {}
 
   async create(data: Partial<IUser>): Promise<IUser> {

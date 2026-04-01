@@ -1,11 +1,9 @@
 import Redis from 'ioredis';
-import { singleton } from 'tsyringe';
 
 import { config } from '@/config';
 
 import logger from './logger.service';
 
-@singleton()
 export default class RedisService {
   private client: Redis | null = null;
 

@@ -1,5 +1,3 @@
-import 'reflect-metadata';
-
 // ──────────────────────────────────────────────
 // ENV: Direct assignment for CI without .env
 // Must match src/config/env.schema.ts
