@@ -5,9 +5,8 @@
 
 FROM node:24-alpine AS base
 
-# Patch OS-level CVEs by upgrading vulnerable system packages
-# CVE-2026-22184: zlib arbitrary code execution (fixed in 1.3.2-r0)
-RUN apk upgrade --no-cache zlib
+# Patch OS-level CVEs by upgrading Alpine packages in the base image
+RUN apk upgrade --no-cache
 
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init
@@ -63,18 +62,7 @@ USER app
 RUN npm ci --omit=dev
 
 # Production stage
-FROM node:24-alpine AS production
-
-# Patch OS-level CVEs by upgrading vulnerable system packages
-# CVE-2026-22184: zlib arbitrary code execution (fixed in 1.3.2-r0)
-RUN apk upgrade --no-cache zlib
-
-# Install dumb-init
-RUN apk add --no-cache dumb-init
-
-# Create non-root user
-RUN addgroup -g 1001 app && \
-    adduser -u 1001 -G app -h /home/app -D app
+FROM base AS production
 
 WORKDIR /home/app/backend-template
 
