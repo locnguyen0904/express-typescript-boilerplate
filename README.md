@@ -17,7 +17,7 @@ Production-ready Express.js + TypeScript + MongoDB backend template with best pr
 | Validation    | Zod 4                                           |
 | API Docs      | OpenAPI 3 (auto-generated)                      |
 | Auth          | JWT (access + refresh tokens, token revocation) |
-| DI            | tsyringe (Microsoft)                            |
+| DI            | Manual DI (composition root)                    |
 | Logging       | Pino (JSON stdout)                              |
 | Jobs          | BullMQ + Bull Board UI                          |
 | Observability | OpenTelemetry (opt-in)                          |
@@ -113,6 +113,8 @@ npm run generate                  # Generate new API module (Plop)
 | `JWT_ACCESS_EXPIRATION_MINUTES` | Access token expiry (default: 30)     | No       |
 | `JWT_REFRESH_EXPIRATION_DAYS`   | Refresh token expiry (default: 30)    | No       |
 | `REDIS_URL`                     | Redis connection string               | No       |
+| `CACHE_ENABLED`                 | Enable Redis-backed caching features  | No       |
+| `JOBS_ENABLED`                  | Enable BullMQ workers and Bull Board  | No       |
 | `PORT`                          | Server port (default: 3000)           | No       |
 | `LOG_LEVEL`                     | Pino log level (default: info)        | No       |
 | `OTEL_ENABLED`                  | Enable OpenTelemetry (default: false) | No       |
@@ -129,6 +131,30 @@ npm run generate                  # Generate new API module (Plop)
 - 📊 **Observability:** OpenTelemetry auto-instrumentation (opt-in)
 - 🧪 **Testing:** Jest with mongodb-memory-server (no external DB needed), 68 tests
 - 🛠️ **DX:** tsx hot reload, Plop module scaffolding, lint-staged, path aliases (`@/`)
+
+## 🧩 Core vs Optional Modules
+
+### Core by default
+
+- Express 5 + TypeScript app structure
+- MongoDB + Mongoose persistence
+- Zod validation + OpenAPI generation
+- Auth, error handling, logging, and HTTP middleware
+
+### Optional modules
+
+- Redis-backed caching and token revocation helpers
+- BullMQ workers + Bull Board UI
+- OpenTelemetry instrumentation
+- React Admin frontend workspace
+
+The backend keeps these optional modules available, but they can now be disabled explicitly in env config when you want a lighter starting point:
+
+```bash
+CACHE_ENABLED=false   # Skip Redis connection and Redis-backed caching behavior
+JOBS_ENABLED=false    # Skip BullMQ initialization and unmount /admin/queues
+# OTEL_ENABLED=false  # Default already off unless enabled explicitly
+```
 
 ## 📚 Documentation
 

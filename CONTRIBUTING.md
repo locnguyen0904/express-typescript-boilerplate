@@ -131,11 +131,9 @@ If creating manually, follow this pattern:
 
 ```typescript
 // product.repository.ts
-import { singleton } from "tsyringe";
 import { Repository } from "@/core";
 import Product, { IProduct } from "./product.model";
 
-@singleton()
 export class ProductRepository extends Repository<IProduct> {
   constructor() {
     super(Product);
@@ -143,14 +141,11 @@ export class ProductRepository extends Repository<IProduct> {
 }
 
 // product.service.ts
-import { inject, singleton } from "tsyringe";
 import { ProductRepository } from "./product.repository";
 import { IProduct } from "./product.model";
 
-@singleton()
 export class ProductService {
   constructor(
-    @inject(ProductRepository)
     private readonly productRepository: ProductRepository,
   ) {}
 
@@ -162,6 +157,10 @@ export class ProductService {
     return this.productRepository.findById(id);
   }
 }
+
+// container.ts
+const productRepository = new ProductRepository();
+const productService = new ProductService(productRepository);
 ```
 
 ## Pull Request Guidelines

@@ -71,7 +71,6 @@ export abstract class Repository<T extends BaseDocument> {
 ### Domain Repository Example
 
 ```typescript
-@singleton()
 export class UserRepository extends Repository<IUser> {
   constructor() {
     super(User);
@@ -101,43 +100,43 @@ export class UserRepository extends Repository<IUser> {
 
 ## Dependency Injection
 
-Using [tsyringe](https://github.com/microsoft/tsyringe) (by Microsoft) for constructor injection.
+Using Manual DI with a composition root in `backend/src/container.ts`.
 
-> **Important:** Because `tsx` (esbuild) does not support `emitDecoratorMetadata`, all constructor parameters must use explicit `@inject()` decorators.
+All shared instances are created once and wired together with plain constructors. Routes and runtime code import resolved instances from the container instead of resolving classes through a DI framework.
 
 ```typescript
-// Repository - no DI params (passes static model to super)
-@singleton()
+// Repository - plain class
 export class UserRepository extends Repository<IUser> {
   constructor() {
     super(User);
   }
 }
 
-// Service - injects Repository with @inject()
-@singleton()
+// Service - constructor dependencies stay explicit
 export class UserService {
   constructor(
-    @inject(UserRepository) private readonly userRepository: UserRepository,
-    @inject(EventService) private readonly eventService: EventService,
+    private readonly userRepository: UserRepository,
+    private readonly eventService: EventService,
   ) {}
 }
 
-// Controller - injects Service with @inject()
-@singleton()
+// Controller - plain constructor injection
 export class UserController {
-  constructor(@inject(UserService) private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 }
 
-// Routes - resolves Controller from container
-const controller = container.resolve(UserController);
+// container.ts - composition root
+const userRepository = new UserRepository();
+const userService = new UserService(userRepository, eventService);
+export const userController = new UserController(userService);
 ```
 
 ### Why DI?
 
 - **Testability:** Replace with mocks easily
 - **Loose coupling:** Classes don't construct dependencies
-- **Single instances:** Services are singletons by default
+- **Simple runtime:** No decorators, metadata reflection, or container magic
+- **Single instances:** Shared services stay singleton-like through the composition root
 
 ## Response Classes
 
@@ -335,7 +334,7 @@ Key decisions are documented in `docs/adr/`:
 | ADR                                             | Decision                          |
 | ----------------------------------------------- | --------------------------------- |
 | [001](adr/001-argon2-password-hashing.md)       | Argon2 for password hashing       |
-| [002](adr/002-tsyringe-dependency-injection.md) | tsyringe for dependency injection |
+| [002](adr/002-tsyringe-dependency-injection.md) | Manual DI with composition root   |
 | [003](adr/003-pino-logging.md)                  | Pino for logging                  |
 | [004](adr/004-rfc9457-error-format.md)          | RFC 9457 error format             |
 | [005](adr/005-opentelemetry-observability.md)   | OpenTelemetry for observability   |

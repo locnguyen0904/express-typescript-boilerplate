@@ -3,6 +3,19 @@ import { z } from 'zod';
 
 dotenv.config();
 
+const booleanFlag = (defaultValue: boolean) =>
+  z.preprocess((value) => {
+    if (typeof value === 'boolean') return value;
+
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      if (normalized === 'true') return true;
+      if (normalized === 'false') return false;
+    }
+
+    return value;
+  }, z.boolean().default(defaultValue));
+
 const envSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'production', 'test'])
@@ -19,6 +32,8 @@ const envSchema = z.object({
   FIREBASE_CLIENT_EMAIL: z.string().optional(),
   FIREBASE_PRIVATE_KEY: z.string().optional(),
   REDIS_URL: z.string().optional(),
+  CACHE_ENABLED: booleanFlag(true),
+  JOBS_ENABLED: booleanFlag(true),
   ALLOWED_ORIGINS: z.string().optional(),
   LOG_LEVEL: z.string().optional(),
   OTEL_ENABLED: z.string().optional(),

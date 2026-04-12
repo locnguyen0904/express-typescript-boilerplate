@@ -66,7 +66,12 @@ async function bootstrap(): Promise<void> {
   try {
     await mongoose.connectDB();
     await redisService.connect();
-    await initializeJobs();
+
+    if (config.features.jobsEnabled) {
+      await initializeJobs();
+    } else {
+      logger.info('Skipping job initialization because JOBS_ENABLED=false');
+    }
 
     const server = http.createServer(app);
     initGracefulShutdown(server);

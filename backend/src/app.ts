@@ -82,32 +82,34 @@ app.get('/', (_req: Request, res: Response) => {
 app.get('/health', healthHandler);
 
 // Bull Board - Queue monitoring UI (basic auth)
-const bullBoardAdapter = new ExpressAdapter();
-bullBoardAdapter.setBasePath('/admin/queues');
-createBullBoard({
-  queues: getQueues().map((q) => new BullMQAdapter(q)),
-  serverAdapter: bullBoardAdapter,
-});
-app.use(
-  '/admin/queues',
-  (req: Request, res: Response, next) => {
-    const auth = req.headers.authorization;
-    if (auth?.startsWith('Basic ')) {
-      const [username, password] = Buffer.from(auth.slice(6), 'base64')
-        .toString()
-        .split(':');
-      if (
-        username === env.BULL_BOARD_USERNAME &&
-        password === env.BULL_BOARD_PASSWORD
-      ) {
-        return next();
+if (config.features.jobsEnabled) {
+  const bullBoardAdapter = new ExpressAdapter();
+  bullBoardAdapter.setBasePath('/admin/queues');
+  createBullBoard({
+    queues: getQueues().map((q) => new BullMQAdapter(q)),
+    serverAdapter: bullBoardAdapter,
+  });
+  app.use(
+    '/admin/queues',
+    (req: Request, res: Response, next) => {
+      const auth = req.headers.authorization;
+      if (auth?.startsWith('Basic ')) {
+        const [username, password] = Buffer.from(auth.slice(6), 'base64')
+          .toString()
+          .split(':');
+        if (
+          username === env.BULL_BOARD_USERNAME &&
+          password === env.BULL_BOARD_PASSWORD
+        ) {
+          return next();
+        }
       }
-    }
-    res.setHeader('WWW-Authenticate', 'Basic realm="Bull Board"');
-    res.status(401).send('Authentication required');
-  },
-  bullBoardAdapter.getRouter()
-);
+      res.setHeader('WWW-Authenticate', 'Basic realm="Bull Board"');
+      res.status(401).send('Authentication required');
+    },
+    bullBoardAdapter.getRouter()
+  );
+}
 
 app.use(rootApi, api);
 

@@ -16,6 +16,13 @@ export default class RedisService {
   }
 
   async connect(): Promise<void> {
+    if (!config.redis.enabled) {
+      logger.info(
+        'Redis disabled via CACHE_ENABLED=false, skipping connection'
+      );
+      return;
+    }
+
     if (!config.redis.url) {
       logger.warn('Redis URL not configured, skipping connection');
       return;

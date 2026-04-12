@@ -23,7 +23,12 @@ interface IFirebaseConfig {
 }
 
 interface IRedisConfig {
+  enabled: boolean;
   url?: string;
+}
+
+interface IFeatureConfig {
+  jobsEnabled: boolean;
 }
 
 interface IConfig {
@@ -32,6 +37,7 @@ interface IConfig {
   admin: IAdminConfig;
   firebase: IFirebaseConfig;
   redis: IRedisConfig;
+  features: IFeatureConfig;
   env: string;
   port?: number;
   logLevel: string;
@@ -57,7 +63,11 @@ const config: IConfig = {
     privateKey: (env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
   },
   redis: {
+    enabled: env.CACHE_ENABLED,
     url: env.REDIS_URL,
+  },
+  features: {
+    jobsEnabled: env.JOBS_ENABLED,
   },
   env: env.NODE_ENV,
   port: env.PORT,

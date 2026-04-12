@@ -1,7 +1,9 @@
 import { Queue, Worker } from 'bullmq';
 import IORedis, { RedisOptions } from 'ioredis';
 
+import { config } from '@/config';
 import { redisService } from '@/container';
+import { logger } from '@/services';
 
 import { createEmailQueue } from './queues/email.queue';
 import { closeEmailWorker, createEmailWorker } from './workers/email.worker';
@@ -16,8 +18,13 @@ export function getRedisConnection(): IORedis | null {
 }
 
 export async function initializeJobs(): Promise<void> {
+  if (!config.features.jobsEnabled) {
+    logger.info('Jobs disabled via JOBS_ENABLED=false');
+    return;
+  }
+
   if (!redisService.isConnected || !redisService.instance) {
-    console.warn('Redis not connected, job queues disabled');
+    logger.warn('Redis not connected, job queues disabled');
     return;
   }
 
@@ -40,7 +47,7 @@ export async function initializeJobs(): Promise<void> {
   const emailWorker = createEmailWorker();
   if (emailWorker) workers.push(emailWorker);
 
-  console.log(
+  logger.info(
     `Job system initialized: ${queues.length} queue(s), ${workers.length} worker(s)`
   );
 }

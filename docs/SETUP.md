@@ -59,6 +59,8 @@ JWT_REFRESH_EXPIRATION_DAYS=30
 
 # Redis (for caching)
 REDIS_URL=redis://redis:6379
+CACHE_ENABLED=true
+JOBS_ENABLED=true
 
 # Server
 PORT=3000
@@ -75,6 +77,14 @@ MONGO_INITDB_ROOT_PASSWORD=password123
 | ------------------- | ------- | ----------- |
 | `DATABASE_URL` host | `mongo` | `localhost` |
 | `REDIS_URL` host    | `redis` | `localhost` |
+
+### Optional Modules
+
+The template keeps a few heavier integrations available without making them mandatory:
+
+- `CACHE_ENABLED=false` disables the Redis connection and Redis-backed caching behavior.
+- `JOBS_ENABLED=false` disables BullMQ startup and unmounts Bull Board at `/admin/queues`.
+- `OTEL_ENABLED=true` opts into OpenTelemetry instrumentation when you want it.
 
 ## Database Setup
 
@@ -134,6 +144,8 @@ Create `backend/.env`:
 DATABASE_URL=mongodb://admin:password123@localhost:27017/backend-template?authSource=admin&replicaSet=rs0
 JWT_SECRET=your-secret-key-min-32-chars-long
 REDIS_URL=redis://localhost:6379
+CACHE_ENABLED=true
+JOBS_ENABLED=true
 PORT=3000
 NODE_ENV=development
 ```

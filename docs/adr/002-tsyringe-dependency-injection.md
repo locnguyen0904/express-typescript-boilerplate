@@ -1,47 +1,37 @@
-# ADR-002: Dependency Injection Strategy
+# ADR-002: Manual Dependency Injection Strategy
 
 **Date:** 2026-02-07
-**Status:** Superseded by Manual DI (2026-04-01)
+**Status:** Accepted
 
-## Original Context
+## Context
 
-The template was using `typedi` for dependency injection. TypeDI has been unmaintained since January 2021, with no new releases or security patches. We replaced it with `tsyringe` (maintained by Microsoft).
+The template previously experimented with decorator-based dependency injection libraries. That approach added framework coupling, extra metadata requirements, and more moving parts than this codebase needs.
 
-## Superseding Decision (2026-04-01)
+## Decision
 
-Replace `tsyringe` with Manual DI (composition root pattern).
+Use Manual DI with a composition root in `backend/src/container.ts`.
 
 ### Why
 
-- tsyringe has uncertain maintenance (60+ open issues, slow triage)
-- Requires legacy `experimentalDecorators` and `emitDecoratorMetadata`
-- esbuild/tsx doesn't support `emitDecoratorMetadata`, forcing explicit `@inject()` on every param
-- With only 11 singletons, a DI library adds unnecessary complexity
+- Decorator-based DI requires legacy `experimentalDecorators` and `emitDecoratorMetadata`
+- `tsx`/esbuild does not support `emitDecoratorMetadata`, forcing explicit DI workarounds
+- With a small set of shared singletons, a DI library adds more ceremony than value
 - Manual DI provides maximum type safety with zero runtime overhead
 
 ### How
 
 All service instances are created in `backend/src/container.ts` (composition root) using plain `new` constructors. Modules import resolved instances directly. No decorators, no `reflect-metadata`, no DI library.
 
-### Migration Mapping
-
-| tsyringe                         | Manual DI                                      |
-| -------------------------------- | ---------------------------------------------- |
-| `@singleton()`                   | (removed — classes are plain)                  |
-| `@inject(Dep) private dep: Dep`  | `private dep: Dep` (constructor)               |
-| `container.resolve(Class)`       | `import { instance } from '@/container'`       |
-| `reflect-metadata`               | (removed)                                      |
-
-## Original Consequences
+## Consequences
 
 **Positive:**
 
-- Actively maintained by Microsoft
-- Same decorator-based DI pattern (minimal migration effort)
-- Compatible with `reflect-metadata` and existing TypeScript decorator config
-- Supports `@injectable()` (transient) and `@singleton()` scopes
+- Dependencies are visible and explicit at the composition root
+- No decorators, metadata reflection, or container magic required
+- Works cleanly with the current `tsx` + TypeScript setup
+- Easier to trace startup order and optional infrastructure wiring
 
 **Negative:**
 
-- API differences require a one-time migration of all DI references
-- tsyringe is more explicit about singleton vs transient scope (TypeDI defaults to singleton)
+- `container.ts` must be maintained carefully as the app grows
+- Instance wiring is manual rather than auto-resolved
