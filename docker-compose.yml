@@ -1,12 +1,12 @@
 volumes:
   mongo_data:
     labels:
-      com.backend-template.description: "MongoDB data directory"
-      com.backend-template.backup-priority: "critical"
+      com.backend-template.description: 'MongoDB data directory'
+      com.backend-template.backup-priority: 'critical'
   redis_data:
     labels:
-      com.backend-template.description: "Redis persistence data"
-      com.backend-template.backup-priority: "medium"
+      com.backend-template.description: 'Redis persistence data'
+      com.backend-template.backup-priority: 'medium'
 
 services:
   mongo:
@@ -34,7 +34,7 @@ services:
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -50,17 +50,14 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 15s
-
-  frontend:
-    build:
-      context: .
-      dockerfile: compose/frontend/Dockerfile
-    restart: always
-    depends_on:
-      backend:
-        condition: service_healthy

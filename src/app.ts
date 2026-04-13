@@ -42,7 +42,7 @@ app.use(
   cors({
     origin:
       config.env === 'production'
-        ? env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3001']
+        ? env.ALLOWED_ORIGINS?.split(',') || []
         : true,
     credentials: true,
   })

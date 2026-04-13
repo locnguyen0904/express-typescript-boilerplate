@@ -47,7 +47,6 @@ docker compose logs -f backend
 | Swagger UI          | http://localhost:3000/api-docs     |
 | Health Check        | http://localhost:3000/health       |
 | Bull Board (Queues) | http://localhost:3000/admin/queues |
-| Frontend            | http://localhost:3001              |
 
 ## 🏗 Architecture
 
@@ -65,7 +64,7 @@ Request → Routes → Controller → Service → Repository → Model → Mongo
 ## 📁 Project Structure
 
 ```
-backend/src/
+src/
 ├── api/                    # Feature modules
 │   └── {resource}/
 │       ├── {resource}.controller.ts
@@ -92,7 +91,7 @@ docker compose up -d              # Start all services
 docker compose logs -f backend    # View backend logs
 docker compose down               # Stop all services
 
-# Backend (run from backend/)
+# Development
 npm run dev                       # Start dev server
 npm run build                     # Build for production
 npm run lint                      # Check linting
@@ -146,9 +145,8 @@ npm run generate                  # Generate new API module (Plop)
 - Redis-backed caching and token revocation helpers
 - BullMQ workers + Bull Board UI
 - OpenTelemetry instrumentation
-- React Admin frontend workspace
 
-The backend keeps these optional modules available, but they can now be disabled explicitly in env config when you want a lighter starting point:
+The project keeps these optional modules available, but they can be disabled explicitly in env config when you want a lighter starting point:
 
 ```bash
 CACHE_ENABLED=false   # Skip Redis connection and Redis-backed caching behavior
@@ -158,13 +156,12 @@ JOBS_ENABLED=false    # Skip BullMQ initialization and unmount /admin/queues
 
 ## 📚 Documentation
 
-| Document                                     | Description                      |
-| -------------------------------------------- | -------------------------------- |
-
-| [CONTRIBUTING.md](CONTRIBUTING.md)           | Git flow, code standards         |
-| [docs/SETUP.md](docs/SETUP.md)               | Detailed development setup       |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Design decisions                 |
-| [docs/adr/](docs/adr/)                       | Architectural Decision Records   |
+| Document                                     | Description                    |
+| -------------------------------------------- | ------------------------------ |
+| [CONTRIBUTING.md](CONTRIBUTING.md)           | Git flow, code standards       |
+| [docs/SETUP.md](docs/SETUP.md)               | Detailed development setup     |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Design decisions               |
+| [docs/adr/](docs/adr/)                       | Architectural Decision Records |
 
 ## 📄 License
 

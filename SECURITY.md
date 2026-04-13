@@ -68,7 +68,7 @@ Once a fix is available:
 
 ### In Scope
 
-- Vulnerabilities in backend source code under `backend/src/`
+- Vulnerabilities in backend source code under `src/`
 - Authentication and authorization bypass
 - Injection vulnerabilities (SQL, NoSQL, command injection)
 - Sensitive data exposure
@@ -94,4 +94,4 @@ If you are using this template as a starting point, ensure you:
 - Review and tighten `ALLOWED_ORIGINS` in production
 - Enable Trivy or similar dependency scanning in your CI pipeline
 - Set `OTEL_ENABLED=true` and route traces to your observability platform
-- Review and customise rate limits in `backend/src/middlewares/rate-limit.middleware.ts`
+- Review and customise rate limits in `src/middlewares/rate-limit.middleware.ts`

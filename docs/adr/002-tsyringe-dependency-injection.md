@@ -9,7 +9,7 @@ The template previously experimented with decorator-based dependency injection l
 
 ## Decision
 
-Use Manual DI with a composition root in `backend/src/container.ts`.
+Use Manual DI with a composition root in `src/container.ts`.
 
 ### Why
 
@@ -20,7 +20,7 @@ Use Manual DI with a composition root in `backend/src/container.ts`.
 
 ### How
 
-All service instances are created in `backend/src/container.ts` (composition root) using plain `new` constructors. Modules import resolved instances directly. No decorators, no `reflect-metadata`, no DI library.
+All service instances are created in `src/container.ts` (composition root) using plain `new` constructors. Modules import resolved instances directly. No decorators, no `reflect-metadata`, no DI library.
 
 ## Consequences
 

@@ -49,11 +49,11 @@ export abstract class Repository<T extends BaseDocument> {
   async updateById(id: string, data: UpdateQuery<T>): Promise<T | null>;
   async updateOne(
     filter: FilterQuery<T>,
-    data: UpdateQuery<T>,
+    data: UpdateQuery<T>
   ): Promise<T | null>;
   async updateMany(
     filter: FilterQuery<T>,
-    data: UpdateQuery<T>,
+    data: UpdateQuery<T>
   ): Promise<number>;
 
   // DELETE (hard)
@@ -100,7 +100,7 @@ export class UserRepository extends Repository<IUser> {
 
 ## Dependency Injection
 
-Using Manual DI with a composition root in `backend/src/container.ts`.
+Using Manual DI with a composition root in `src/container.ts`.
 
 All shared instances are created once and wired together with plain constructors. Routes and runtime code import resolved instances from the container instead of resolving classes through a DI framework.
 
@@ -116,7 +116,7 @@ export class UserRepository extends Repository<IUser> {
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly eventService: EventService,
+    private readonly eventService: EventService
   ) {}
 }
 
@@ -156,10 +156,10 @@ new LIST({
 }).send(res);
 
 // Errors (throw from Service or Controller)
-throw new NotFoundError("User not found"); // 404 → RFC 9457 problem detail
-throw new BadRequestError("Invalid input"); // 400
-throw new UnAuthorizedError("Not logged in"); // 401
-throw new ForbiddenError("Access denied"); // 403
+throw new NotFoundError('User not found'); // 404 → RFC 9457 problem detail
+throw new BadRequestError('Invalid input'); // 400
+throw new UnAuthorizedError('Not logged in'); // 401
+throw new ForbiddenError('Access denied'); // 403
 ```
 
 ### Response Format
@@ -192,7 +192,7 @@ Express 5 natively handles rejected promises in async middleware and route handl
 
 ```typescript
 // Routes bind controller methods directly
-router.get("/:id", controller.findOne.bind(controller));
+router.get('/:id', controller.findOne.bind(controller));
 ```
 
 ### Error Flow
@@ -228,7 +228,7 @@ export const createUserSchema = z.object({
 });
 
 // routes
-router.post("/", validate({ body: createUserSchema }), controller.create);
+router.post('/', validate({ body: createUserSchema }), controller.create);
 ```
 
 ### Benefits
@@ -252,7 +252,7 @@ router.post("/", validate({ body: createUserSchema }), controller.create);
 Custom types in `types/mongoose-plugins.d.ts`:
 
 ```typescript
-declare module "mongoose" {
+declare module 'mongoose' {
   interface SoftDeleteModel<T extends Document> {
     delete(filter?): Promise<{ deletedCount: number }>;
     deleteById(id): Promise<T | null>;
@@ -269,7 +269,7 @@ declare module "mongoose" {
 ## Directory Structure
 
 ```
-backend/src/
+src/
 ├── api/                    # Feature modules
 │   └── {resource}/
 │       ├── {resource}.model.ts        # Schema, interface
@@ -331,11 +331,11 @@ backend/src/
 
 Key decisions are documented in `docs/adr/`:
 
-| ADR                                             | Decision                          |
-| ----------------------------------------------- | --------------------------------- |
-| [001](adr/001-argon2-password-hashing.md)       | Argon2 for password hashing       |
-| [002](adr/002-tsyringe-dependency-injection.md) | Manual DI with composition root   |
-| [003](adr/003-pino-logging.md)                  | Pino for logging                  |
-| [004](adr/004-rfc9457-error-format.md)          | RFC 9457 error format             |
-| [005](adr/005-opentelemetry-observability.md)   | OpenTelemetry for observability   |
-| [006](adr/006-mongodb-replica-set.md)           | MongoDB Replica Set requirement   |
+| ADR                                             | Decision                        |
+| ----------------------------------------------- | ------------------------------- |
+| [001](adr/001-argon2-password-hashing.md)       | Argon2 for password hashing     |
+| [002](adr/002-tsyringe-dependency-injection.md) | Manual DI with composition root |
+| [003](adr/003-pino-logging.md)                  | Pino for logging                |
+| [004](adr/004-rfc9457-error-format.md)          | RFC 9457 error format           |
+| [005](adr/005-opentelemetry-observability.md)   | OpenTelemetry for observability |
+| [006](adr/006-mongodb-replica-set.md)           | MongoDB Replica Set requirement |
