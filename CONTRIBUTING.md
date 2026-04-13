@@ -27,7 +27,7 @@ git checkout -b feature/my-feature
 # ... write code and tests ...
 
 # 3. Verify before commit
-cd backend && npm run lint && npm test
+npm run lint && npm test
 
 # 4. Commit with conventional format
 git add .
@@ -96,7 +96,6 @@ chore(deps): upgrade mongoose to v8
 ### Before Every Commit
 
 ```bash
-cd backend
 npm run prettier:fix    # Format code
 npm run lint            # Check for issues
 npm test                # Run tests
@@ -117,7 +116,6 @@ npm test                # Run tests
 Use the Plop generator for scaffolding:
 
 ```bash
-cd backend
 npm run generate        # Interactive prompt
 # or
 npx plop module products  # Direct
@@ -131,8 +129,8 @@ If creating manually, follow this pattern:
 
 ```typescript
 // product.repository.ts
-import { Repository } from "@/core";
-import Product, { IProduct } from "./product.model";
+import { Repository } from '@/core';
+import Product, { IProduct } from './product.model';
 
 export class ProductRepository extends Repository<IProduct> {
   constructor() {
@@ -141,13 +139,11 @@ export class ProductRepository extends Repository<IProduct> {
 }
 
 // product.service.ts
-import { ProductRepository } from "./product.repository";
-import { IProduct } from "./product.model";
+import { ProductRepository } from './product.repository';
+import { IProduct } from './product.model';
 
 export class ProductService {
-  constructor(
-    private readonly productRepository: ProductRepository,
-  ) {}
+  constructor(private readonly productRepository: ProductRepository) {}
 
   async create(data: Partial<IProduct>): Promise<IProduct> {
     return this.productRepository.create(data);

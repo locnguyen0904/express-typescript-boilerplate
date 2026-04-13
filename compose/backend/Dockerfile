@@ -21,7 +21,7 @@ WORKDIR /home/app/backend-template
 RUN chown -R app:app /home/app/backend-template
 
 # Copy package files
-COPY --chown=app:app backend/package*.json ./
+COPY --chown=app:app package*.json ./
 
 # Development stage
 FROM base AS development
@@ -48,7 +48,7 @@ USER app
 RUN npm ci
 
 # Copy source code
-COPY --chown=app:app backend/ ./
+COPY --chown=app:app . .
 
 # Build the application
 RUN npm run build
@@ -75,7 +75,7 @@ COPY --chown=app:app --from=prod-dependencies /home/app/backend-template/node_mo
 COPY --chown=app:app --from=builder /home/app/backend-template/dist ./dist
 
 # Copy package.json for metadata
-COPY --chown=app:app backend/package.json ./
+COPY --chown=app:app package.json ./
 
 # Set production environment
 ENV NODE_ENV=production

@@ -1,6 +1,4 @@
 networks:
-  frontend-network:
-    driver: bridge
   backend-network:
     driver: bridge
 
@@ -31,21 +29,25 @@ services:
       resources:
         limits:
           memory: 1G
-          cpus: "1.0"
+          cpus: '1.0'
         reservations:
           memory: 512M
     networks:
       - backend-network
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: '10m'
+        max-file: '3'
 
   redis:
     command: sh -c 'redis-server --requirepass "$$(cat /run/secrets/redis_password)" --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru'
     healthcheck:
-      test: ["CMD-SHELL", "REDISCLI_AUTH=$$(cat /run/secrets/redis_password) redis-cli ping"]
+      test:
+        [
+          'CMD-SHELL',
+          'REDISCLI_AUTH=$$(cat /run/secrets/redis_password) redis-cli ping',
+        ]
       interval: 30s
       timeout: 10s
     secrets:
@@ -58,21 +60,21 @@ services:
       resources:
         limits:
           memory: 512M
-          cpus: "0.5"
+          cpus: '0.5'
         reservations:
           memory: 128M
     networks:
       - backend-network
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: '10m'
+        max-file: '3'
 
   backend:
     build:
       target: production
-    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-locnguyen}/backend-template-backend:latest
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-locnguyen}/backend-template:latest
     env_file:
       - .env.prod
     healthcheck:
@@ -90,60 +92,29 @@ services:
       resources:
         limits:
           memory: 512M
-          cpus: "1.0"
+          cpus: '1.0'
         reservations:
           memory: 256M
     networks:
-      - frontend-network
       - backend-network
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "3"
-
-  frontend:
-    build:
-      target: production
-      args:
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
-    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-locnguyen}/backend-template-frontend:latest
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    read_only: true
-    tmpfs:
-      - /tmp
-      - /var/cache/nginx
-      - /var/run
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: "0.5"
-        reservations:
-          memory: 128M
-    networks:
-      - frontend-network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: '10m'
+        max-file: '3'
 
   nginx:
-    image: nginx:1.27-alpine
+    build:
+      context: .
+      dockerfile: compose/nginx/Dockerfile
     restart: always
     ports:
-      - "443:443"
+      - '443:443'
     volumes:
       - ./compose/nginx/conf.d:/etc/nginx/conf.d:ro
       - ./compose/nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
       backend:
-        condition: service_healthy
-      frontend:
         condition: service_healthy
     security_opt:
       - no-new-privileges:true
@@ -160,13 +131,13 @@ services:
       resources:
         limits:
           memory: 128M
-          cpus: "0.25"
+          cpus: '0.25'
         reservations:
           memory: 64M
     networks:
-      - frontend-network
+      - backend-network
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: '10m'
+        max-file: '3'

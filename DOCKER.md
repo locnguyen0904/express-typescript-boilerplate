@@ -5,7 +5,6 @@ This project uses multi-stage Dockerfiles to support both local development and 
 ## Architecture
 
 - **compose/backend/Dockerfile** - Multi-stage backend Dockerfile with `development` and `production` targets
-- **compose/frontend/Dockerfile** - Multi-stage frontend Dockerfile with `development` and `production` targets
 - **docker-compose.yml** - Base/shared configuration (images, healthchecks, volumes)
 - **docker-compose.override.yml** - Development overrides (auto-loaded with `docker compose up`)
 - **docker-compose.prod.yml** - Production overrides (resource limits, logging, prod targets)
@@ -22,14 +21,12 @@ docker compose up -d
 
 ```bash
 docker compose build backend
-docker compose build frontend
 ```
 
 ### View logs
 
 ```bash
 docker compose logs -f backend
-docker compose logs -f frontend
 ```
 
 ### Stop all services
@@ -65,13 +62,14 @@ npm run generate:mongo-key
 ```
 
 > **Linux production note:** The MongoDB keyfile must be readable by the `mongodb` user (UID 999) inside the container. After generating, fix ownership:
+>
 > ```bash
 > sudo chown 999:999 compose/mongo/keys/keyfile.local
 > ```
+>
 > This is not required on Docker Desktop (macOS/Windows) which handles file permissions transparently.
 
 4. Set up Cloudflare Origin Certificate:
-
    1. In Cloudflare dashboard, go to SSL/TLS and set encryption mode to **Full (strict)**
    2. Go to SSL/TLS > Origin Server > Create Certificate
    3. Save the certificate and private key to:
@@ -83,9 +81,9 @@ mkdir -p compose/nginx/ssl
 chmod 600 compose/nginx/ssl/*.pem
 ```
 
-   - Certificate: `compose/nginx/ssl/cert.pem`
-   - Private key: `compose/nginx/ssl/key.pem`
-   - Origin Certificates last up to 15 years
+- Certificate: `compose/nginx/ssl/cert.pem`
+- Private key: `compose/nginx/ssl/key.pem`
+- Origin Certificates last up to 15 years
 
 5. Create secret files for production passwords:
 
@@ -127,19 +125,20 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml down
 The CD pipeline (`.github/workflows/cd.yml`) automatically builds and pushes Docker images to GitHub Container Registry (GHCR) on every push to `main` or version tag (`v*`).
 
 **Triggers:**
+
 - Push to `main` branch → builds and pushes with `latest` + `sha-<commit>` tags
 - Push `v*` tag (e.g., `v1.2.3`) → builds and pushes with semver + `sha-<commit>` tags
 
 **Images:**
+
 - `ghcr.io/<owner>/backend-template-backend`
-- `ghcr.io/<owner>/backend-template-frontend`
 
 **Tagging strategy:**
 
-| Trigger | Tags Applied |
-|---------|-------------|
-| Push to `main` | `latest`, `sha-abc1234` |
-| Tag `v1.2.3` | `1.2.3`, `1.2`, `sha-abc1234` |
+| Trigger        | Tags Applied                  |
+| -------------- | ----------------------------- |
+| Push to `main` | `latest`, `sha-abc1234`       |
+| Tag `v1.2.3`   | `1.2.3`, `1.2`, `sha-abc1234` |
 
 ### GitHub Repository Setup
 
@@ -171,13 +170,11 @@ Every image push includes an immutable `sha-<commit>` tag. To rollback:
 ROLLBACK_SHA=sha-abc1234
 OWNER=locnguyen  # your GitHub username or org
 
-# 2. Pull the specific SHA-tagged images
+# 2. Pull the specific SHA-tagged image
 docker pull ghcr.io/$OWNER/backend-template-backend:$ROLLBACK_SHA
-docker pull ghcr.io/$OWNER/backend-template-frontend:$ROLLBACK_SHA
 
-# 3. Retag as :latest so docker compose uses them
+# 3. Retag as :latest so docker compose uses it
 docker tag ghcr.io/$OWNER/backend-template-backend:$ROLLBACK_SHA ghcr.io/$OWNER/backend-template-backend:latest
-docker tag ghcr.io/$OWNER/backend-template-frontend:$ROLLBACK_SHA ghcr.io/$OWNER/backend-template-frontend:latest
 
 # 4. Restart services (no pull — uses locally tagged images)
 docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod up -d
@@ -214,35 +211,12 @@ docker build --target production -f compose/backend/Dockerfile -t backend:prod .
 - Includes health checks
 - Uses dumb-init for proper signal handling
 
-### Frontend
-
-**Development target:**
-
-```bash
-docker build --target development -f compose/frontend/Dockerfile -t frontend:dev .
-```
-
-- Vite dev server with HMR
-- Source code mounted as volume
-- All dev dependencies included
-
-**Production target:**
-
-```bash
-docker build --target production -f compose/frontend/Dockerfile -t frontend:prod .
-```
-
-- Static build served by nginx
-- Optimized bundle size
-- Includes health checks
-
 ## Port Mapping
 
 ### Development
 
 - Backend: `localhost:3000`
 - Backend Debugger: `localhost:9229`
-- Frontend: `localhost:3001`
 - MongoDB: `localhost:27017`
 - Redis: `localhost:6379`
 
@@ -250,7 +224,6 @@ docker build --target production -f compose/frontend/Dockerfile -t frontend:prod
 
 - Nginx (HTTPS via Cloudflare): `localhost:443`
 - Backend: Internal only (proxied via nginx at `/api/*`)
-- Frontend: Internal only (proxied via nginx at `/`)
 - MongoDB: Internal only (backend-network)
 - Redis: Internal only (backend-network)
 
@@ -258,8 +231,7 @@ docker build --target production -f compose/frontend/Dockerfile -t frontend:prod
 
 ### Development Volumes
 
-- `backend_node_modules` - Backend dependencies (persisted)
-- `frontend_node_modules` - Frontend dependencies (persisted)
+- `node_modules` - Dependencies (persisted via Docker volume)
 - `mongo_data` - MongoDB data
 - Source code directories are bind-mounted for live reload
 
@@ -284,7 +256,6 @@ docker build --target production -f compose/frontend/Dockerfile -t frontend:prod
 
 3. **Health Checks**
    - Backend includes HTTP health check
-   - Frontend includes nginx health check
    - Database services include ping health checks
 
 4. **Logging**
@@ -308,12 +279,11 @@ docker compose exec backend env
 docker compose exec mongo mongosh --eval "db.adminCommand('ping')"
 ```
 
-### Frontend build errors
+### Database connection issues
 
 ```bash
-docker compose logs frontend
-# Rebuild without cache
-docker compose build --no-cache frontend
+# Check MongoDB health
+docker compose exec mongo mongosh --eval "db.adminCommand('ping')"
 ```
 
 ### Permission issues

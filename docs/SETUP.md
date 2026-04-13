@@ -37,7 +37,6 @@ NAME                       STATUS
 backend-template_mongo     running (healthy)
 backend-template_redis     running (healthy)
 backend-template_backend   running
-backend-template_frontend  running
 ```
 
 ## Environment Configuration
@@ -100,7 +99,7 @@ MongoDB is configured as a replica set automatically:
 
 ```bash
 # Development seed
-cd backend && npm run seed:dev
+npm run seed:dev
 ```
 
 ### MongoDB Shell Access
@@ -129,16 +128,15 @@ docker compose up -d mongo redis
 docker compose ps
 ```
 
-### 2. Install Backend Dependencies
+### 2. Install Dependencies
 
 ```bash
-cd backend
 npm install
 ```
 
 ### 3. Configure Local Environment
 
-Create `backend/.env`:
+Create `.env`:
 
 ```bash
 DATABASE_URL=mongodb://admin:password123@localhost:27017/backend-template?authSource=admin&replicaSet=rs0
@@ -153,14 +151,6 @@ NODE_ENV=development
 ### 4. Start Backend
 
 ```bash
-npm run dev
-```
-
-### 5. Start Frontend (Optional)
-
-```bash
-cd frontend
-npm install
 npm run dev
 ```
 
@@ -185,7 +175,6 @@ Open http://localhost:3000/api-docs in browser.
 ### Run Tests
 
 ```bash
-cd backend
 npm test
 ```
 
@@ -261,7 +250,7 @@ PORT=3001
 ```bash
 # Rebuild with fresh node_modules (removes stale named volume)
 docker compose down
-docker volume rm backend-template_backend_node_modules
+docker volume rm backend-template_node_modules
 docker compose up -d --build
 ```
 
