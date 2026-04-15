@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import mongoose from 'mongoose';
 import { ZodError } from 'zod';
 
 import { BadRequestError, NotFoundError } from '@/core';
@@ -130,10 +129,11 @@ describe('Handle Errors Helper', () => {
       );
     });
 
-    it('handles MongoDB duplicate key error', () => {
+    it('handles PostgreSQL duplicate key error (23505)', () => {
       const duplicateError = {
-        code: 11000,
-        keyValue: { email: 'test@example.com' },
+        code: '23505',
+        detail: 'Key (email)=(test@example.com) already exists.',
+        constraint: 'users_email_unique',
       };
 
       errorHandle(
@@ -147,21 +147,19 @@ describe('Handle Errors Helper', () => {
       expect(mockResponse.json).toHaveBeenCalledWith(
         expect.objectContaining({
           title: 'Conflict',
-          detail: 'Duplicate value for email',
+          detail: 'Key (email)=(test@example.com) already exists.',
           code: 'DUPLICATE_KEY',
         })
       );
     });
 
-    it('handles Mongoose CastError', () => {
-      const castError = new mongoose.Error.CastError(
-        'ObjectId',
-        'invalid-id',
-        '_id'
-      );
+    it('handles PostgreSQL invalid input error (22P02)', () => {
+      const invalidInputError = {
+        code: '22P02',
+      };
 
       errorHandle(
-        castError,
+        invalidInputError,
         mockRequest as Request,
         mockResponse as Response,
         mockNext
@@ -170,8 +168,8 @@ describe('Handle Errors Helper', () => {
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith(
         expect.objectContaining({
-          detail: 'Invalid ObjectId format',
-          code: 'INVALID_OBJECT_ID',
+          detail: 'Invalid input format',
+          code: 'INVALID_INPUT',
         })
       );
     });

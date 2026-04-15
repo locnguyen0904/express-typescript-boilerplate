@@ -44,7 +44,7 @@ registry.registerPath({
   method: 'get',
   path: '/{{kebabCase name}}s/{id}',
   tags: ['{{pascalCase name}}s'],
-  summary: 'Get a {{camelCase name}} by ID',
+  summary: 'Get a {{pascalCase name}} by ID',
   request: {
     params: idParamSchema,
   },
@@ -54,7 +54,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: dataResponseSchema(
-            create{{pascalCase name}}Schema.extend({ _id: z.string() })
+            create{{pascalCase name}}Schema.extend({ id: z.string() })
           ),
         },
       },
@@ -92,7 +92,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: dataResponseSchema(
-            create{{pascalCase name}}Schema.extend({ _id: z.string() })
+            create{{pascalCase name}}Schema.extend({ id: z.string() })
           ),
         },
       },
@@ -121,7 +121,7 @@ registry.registerPath({
   method: 'put',
   path: '/{{kebabCase name}}s/{id}',
   tags: ['{{pascalCase name}}s'],
-  summary: 'Update a {{camelCase name}}',
+  summary: 'Update a {{pascalCase name}}',
   security,
   request: {
     params: idParamSchema,
@@ -139,7 +139,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: dataResponseSchema(
-            create{{pascalCase name}}Schema.extend({ _id: z.string() })
+            create{{pascalCase name}}Schema.extend({ id: z.string() })
           ),
         },
       },
@@ -176,8 +176,8 @@ registry.registerPath({
   method: 'delete',
   path: '/{{kebabCase name}}s/{id}',
   tags: ['{{pascalCase name}}s'],
-  summary: 'Soft delete a {{camelCase name}}',
-  description: 'Marks the {{camelCase name}} as deleted without removing it from storage.',
+  summary: 'Soft delete a {{pascalCase name}}',
+  description: 'Marks the {{pascalCase name}} as deleted without removing it from storage.',
   security,
   request: {
     params: idParamSchema,
@@ -188,7 +188,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: dataResponseSchema(
-            create{{pascalCase name}}Schema.extend({ _id: z.string() })
+            create{{pascalCase name}}Schema.extend({ id: z.string() })
           ),
         },
       },

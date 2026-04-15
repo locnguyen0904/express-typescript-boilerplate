@@ -2,6 +2,7 @@ import { env } from './env.schema';
 
 interface IDatabaseConfig {
   url: string;
+  poolSize: number;
 }
 
 interface IJwtConfig {
@@ -32,7 +33,7 @@ interface IFeatureConfig {
 }
 
 interface IConfig {
-  mongodb: IDatabaseConfig;
+  database: IDatabaseConfig;
   jwt: IJwtConfig;
   admin: IAdminConfig;
   firebase: IFirebaseConfig;
@@ -44,8 +45,9 @@ interface IConfig {
 }
 
 const config: IConfig = {
-  mongodb: {
+  database: {
     url: env.DATABASE_URL,
+    poolSize: 10,
   },
   jwt: {
     secret: env.JWT_SECRET,

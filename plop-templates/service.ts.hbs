@@ -1,8 +1,7 @@
-import { PaginateResult } from 'mongoose';
-
+import { PaginatedResult } from '@/core';
 import { RedisService } from '@/services';
 
-import { I{{pascalCase name}} } from './{{kebabCase name}}.model';
+import { I{{pascalCase name}} } from './{{kebabCase name}}.interface';
 import { {{pascalCase name}}Repository } from './{{kebabCase name}}.repository';
 
 export default class {{pascalCase name}}Service {
@@ -25,13 +24,13 @@ export default class {{pascalCase name}}Service {
     return this.{{camelCase name}}Repository.findById(id);
   }
 
-  async findAll(query: Record<string, unknown> = {}): Promise<PaginateResult<I{{pascalCase name}}>> {
+  async findAll(query: Record<string, unknown> = {}): Promise<PaginatedResult<I{{pascalCase name}}>> {
     if (!this.redis.isConnected) {
       return this.{{camelCase name}}Repository.findAll(query);
     }
 
     const cacheKey = `{{camelCase name}}s:list:${JSON.stringify(query)}`;
-    const cached = await this.redis.get<PaginateResult<I{{pascalCase name}}>>(cacheKey);
+    const cached = await this.redis.get<PaginatedResult<I{{pascalCase name}}>>(cacheKey);
 
     if (cached) {
       return cached;
@@ -57,20 +56,4 @@ export default class {{pascalCase name}}Service {
     }
     return deleted;
   }
-
-  async softDelete(id: string): Promise<I{{pascalCase name}} | null> {
-    const deleted = await this.{{camelCase name}}Repository.softDeleteById(id);
-    if (deleted) {
-      await this.invalidateListCache();
-    }
-    return deleted;
   }
-
-  async restore(id: string): Promise<I{{pascalCase name}} | null> {
-    const restored = await this.{{camelCase name}}Repository.restoreById(id);
-    if (restored) {
-      await this.invalidateListCache();
-    }
-    return restored;
-  }
-}

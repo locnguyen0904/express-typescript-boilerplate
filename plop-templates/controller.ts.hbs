@@ -40,7 +40,7 @@ export default class {{pascalCase name}}Controller {
   }
 
   async delete(req: Request, res: Response): Promise<void> {
-    const {{camelCase name}} = await this.{{camelCase name}}Service.softDelete(req.params.id);
+    const {{camelCase name}} = await this.{{camelCase name}}Service.remove(req.params.id);
     if (!{{camelCase name}}) {
       throw new NotFoundError('{{pascalCase name}} not found');
     }

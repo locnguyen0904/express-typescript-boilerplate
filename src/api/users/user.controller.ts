@@ -42,7 +42,7 @@ export default class UserController {
   }
 
   async delete(req: Request, res: Response): Promise<void> {
-    const user = await this.userService.softDelete(req.params.id as string);
+    const user = await this.userService.remove(req.params.id as string);
     if (!user) {
       throw new NotFoundError('User not found');
     }

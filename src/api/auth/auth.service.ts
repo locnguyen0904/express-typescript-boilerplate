@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 
-import { IUser } from '@/api/users/user.model';
+import { IUser } from '@/api/users/user.interface';
 import UserService from '@/api/users/user.service';
 import { config } from '@/config';
 import { UnAuthorizedError } from '@/core';

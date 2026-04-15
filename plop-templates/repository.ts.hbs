@@ -1,9 +1,10 @@
 import { Repository } from '@/core';
+import { {{pluralCamelCase name}} } from '@/db/schema';
 
-import {{pascalCase name}}, { I{{pascalCase name}} } from './{{kebabCase name}}.model';
+import { I{{pascalCase name}} } from './{{kebabCase name}}.interface';
 
 export class {{pascalCase name}}Repository extends Repository<I{{pascalCase name}}> {
   constructor() {
-    super({{pascalCase name}});
+    super({{pluralCamelCase name}});
   }
 }

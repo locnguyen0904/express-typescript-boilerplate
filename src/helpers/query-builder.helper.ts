@@ -1,167 +1,125 @@
-export default class QueryBuilder<T> {
-  private query: Record<string, unknown> = {};
+import {
+  and,
+  between,
+  eq,
+  gt,
+  gte,
+  ilike,
+  inArray,
+  isNotNull,
+  isNull,
+  like,
+  lt,
+  lte,
+  ne,
+  not,
+  notInArray,
+  or,
+  SQL,
+} from 'drizzle-orm';
+import { PgColumn } from 'drizzle-orm/pg-core';
 
-  // Comparison Operators
-  where(field: keyof T | string, value: unknown): this {
-    this.query[field as string] = value;
+export default class QueryBuilder {
+  private conditions: SQL[] = [];
+
+  where<T>(column: PgColumn, value: T): this {
+    this.conditions.push(eq(column, value as never));
     return this;
   }
 
-  whereNot(field: keyof T | string, value: unknown): this {
-    this.query[field as string] = { $ne: value };
+  whereNot<T>(column: PgColumn, value: T): this {
+    this.conditions.push(ne(column, value as never));
     return this;
   }
 
-  whereIn(field: keyof T | string, values: unknown[]): this {
-    this.query[field as string] = { $in: values };
+  whereIn<T>(column: PgColumn, values: T[]): this {
+    this.conditions.push(inArray(column, values as never[]));
     return this;
   }
 
-  whereNotIn(field: keyof T | string, values: unknown[]): this {
-    this.query[field as string] = { $nin: values };
+  whereNotIn<T>(column: PgColumn, values: T[]): this {
+    this.conditions.push(notInArray(column, values as never[]));
     return this;
   }
 
-  whereGreaterThan(field: keyof T | string, value: unknown): this {
-    this.query[field as string] = { $gt: value };
+  whereGreaterThan<T>(column: PgColumn, value: T): this {
+    this.conditions.push(gt(column, value as never));
     return this;
   }
 
-  whereGreaterThanOrEqual(field: keyof T | string, value: unknown): this {
-    this.query[field as string] = { $gte: value };
+  whereGreaterThanOrEqual<T>(column: PgColumn, value: T): this {
+    this.conditions.push(gte(column, value as never));
     return this;
   }
 
-  whereLessThan(field: keyof T | string, value: unknown): this {
-    this.query[field as string] = { $lt: value };
+  whereLessThan<T>(column: PgColumn, value: T): this {
+    this.conditions.push(lt(column, value as never));
     return this;
   }
 
-  whereLessThanOrEqual(field: keyof T | string, value: unknown): this {
-    this.query[field as string] = { $lte: value };
+  whereLessThanOrEqual<T>(column: PgColumn, value: T): this {
+    this.conditions.push(lte(column, value as never));
     return this;
   }
 
-  whereBetween(field: keyof T | string, min: unknown, max: unknown): this {
-    this.query[field as string] = { $gte: min, $lte: max };
+  whereBetween<T>(column: PgColumn, min: T, max: T): this {
+    this.conditions.push(between(column, min as never, max as never));
     return this;
   }
 
-  // Element Operators
-  whereExists(field: keyof T | string, exists = true): this {
-    this.query[field as string] = { $exists: exists };
+  whereNull(column: PgColumn): this {
+    this.conditions.push(isNull(column));
     return this;
   }
 
-  whereType(field: keyof T | string, type: string | number): this {
-    this.query[field as string] = { $type: type };
+  whereNotNull(column: PgColumn): this {
+    this.conditions.push(isNotNull(column));
     return this;
   }
 
-  // Array Operators
-  whereAll(field: keyof T | string, values: unknown[]): this {
-    this.query[field as string] = { $all: values };
+  whereLike(column: PgColumn, pattern: string): this {
+    this.conditions.push(like(column, pattern));
     return this;
   }
 
-  whereSize(field: keyof T | string, size: number): this {
-    this.query[field as string] = { $size: size };
+  whereILike(column: PgColumn, pattern: string): this {
+    this.conditions.push(ilike(column, pattern));
     return this;
   }
 
-  whereElemMatch(
-    field: keyof T | string,
-    condition: Record<string, unknown>
-  ): this {
-    this.query[field as string] = { $elemMatch: condition };
+  search(column: PgColumn, term: string): this {
+    this.conditions.push(ilike(column, `%${term}%`));
     return this;
   }
 
-  // String/Regex Operators
-  search(field: keyof T | string, term: string, options = 'i'): this {
-    this.query[field as string] = { $regex: term, $options: options };
+  whereNotCondition(condition: SQL): this {
+    this.conditions.push(not(condition));
     return this;
   }
 
-  whereRegex(
-    field: keyof T | string,
-    pattern: string | RegExp,
-    options?: string
-  ): this {
-    this.query[field as string] = options
-      ? { $regex: pattern, $options: options }
-      : { $regex: pattern };
+  orGroup(conditions: SQL[]): this {
+    this.conditions.push(or(...conditions)!);
     return this;
   }
 
-  // Logical Operators
-  or(conditions: Record<string, unknown>[]): this {
-    this.query.$or = conditions;
+  andGroup(conditions: SQL[]): this {
+    this.conditions.push(and(...conditions)!);
     return this;
   }
 
-  and(conditions: Record<string, unknown>[]): this {
-    this.query.$and = conditions;
+  raw(condition: SQL): this {
+    this.conditions.push(condition);
     return this;
   }
 
-  nor(conditions: Record<string, unknown>[]): this {
-    this.query.$nor = conditions;
-    return this;
-  }
-
-  not(field: keyof T | string, condition: Record<string, unknown>): this {
-    this.query[field as string] = { $not: condition };
-    return this;
-  }
-
-  // Evaluation Operators
-  whereMod(field: keyof T | string, divisor: number, remainder: number): this {
-    this.query[field as string] = { $mod: [divisor, remainder] };
-    return this;
-  }
-
-  whereExpr(expression: Record<string, unknown>): this {
-    this.query.$expr = expression;
-    return this;
-  }
-
-  // Geospatial Operators
-  whereNear(
-    field: keyof T | string,
-    coordinates: [number, number],
-    maxDistance?: number,
-    minDistance?: number
-  ): this {
-    const near: Record<string, unknown> = {
-      $geometry: { type: 'Point', coordinates },
-    };
-    if (maxDistance !== undefined) near.$maxDistance = maxDistance;
-    if (minDistance !== undefined) near.$minDistance = minDistance;
-    this.query[field as string] = { $near: near };
-    return this;
-  }
-
-  whereGeoWithin(
-    field: keyof T | string,
-    geometry: Record<string, unknown>
-  ): this {
-    this.query[field as string] = { $geoWithin: { $geometry: geometry } };
-    return this;
-  }
-
-  // Utility Methods
-  raw(query: Record<string, unknown>): this {
-    this.query = { ...this.query, ...query };
-    return this;
-  }
-
-  build(): Record<string, unknown> {
-    return this.query;
+  build(): SQL | undefined {
+    if (this.conditions.length === 0) return undefined;
+    if (this.conditions.length === 1) return this.conditions[0];
+    return and(...this.conditions)!;
   }
 
   reset(): this {
-    this.query = {};
+    this.conditions = [];
     return this;
   }
 }

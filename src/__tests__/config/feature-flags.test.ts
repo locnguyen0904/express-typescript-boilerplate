@@ -16,7 +16,7 @@ describe('Feature flag config', () => {
   beforeEach(() => {
     process.env = {
       ...originalEnv,
-      DATABASE_URL: 'mongodb://localhost:27017/test',
+      DATABASE_URL: 'postgresql://localhost:5432/test',
       JWT_SECRET: '12345678901234567890123456789012',
     };
   });

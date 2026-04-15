@@ -130,7 +130,7 @@ If creating manually, follow this pattern:
 ```typescript
 // product.repository.ts
 import { Repository } from '@/core';
-import Product, { IProduct } from './product.model';
+import Product, { IProduct } from './product.interface';
 
 export class ProductRepository extends Repository<IProduct> {
   constructor() {
@@ -140,7 +140,7 @@ export class ProductRepository extends Repository<IProduct> {
 
 // product.service.ts
 import { ProductRepository } from './product.repository';
-import { IProduct } from './product.model';
+import { IProduct } from './product.interface';
 
 export class ProductService {
   constructor(private readonly productRepository: ProductRepository) {}

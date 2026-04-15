@@ -3,7 +3,8 @@
 // Must match src/config/env.schema.ts
 // ──────────────────────────────────────────────
 process.env.DATABASE_URL =
-  process.env.MONGO_MEMORY_URI || 'mongodb://localhost:27017/test';
+  process.env.DATABASE_URL ||
+  'postgresql://admin:password123@localhost:5432/backend-template-test';
 process.env.REDIS_URL = 'redis://localhost:6379';
 process.env.JWT_SECRET = 'test-secret-key-32-characters-long-minimum-integrity';
 process.env.JWT_ACCESS_EXPIRATION_MINUTES = '30';

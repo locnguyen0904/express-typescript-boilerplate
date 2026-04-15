@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response as ExpressResponse } from 'express';
-import mongoose from 'mongoose';
 import { ZodError } from 'zod';
 
 import { AppError, InternalServerError, NotFoundError } from '@/core';
@@ -61,30 +60,26 @@ export const errorHandle = (
   }
 
   if (isDuplicateKeyError(error)) {
-    const keyValue = error.keyValue ?? {};
-    const fields = Object.keys(keyValue);
+    const detail = extractDuplicateDetail(error);
     sendProblem(res, {
       type: 'about:blank',
       title: 'Conflict',
       status: 409,
-      detail:
-        fields.length > 0
-          ? `Duplicate value for ${fields.join(', ')}`
-          : 'Duplicate key error',
+      detail: detail || 'Duplicate key error',
       instance,
       code: 'DUPLICATE_KEY',
     });
     return;
   }
 
-  if (error instanceof mongoose.Error.CastError) {
+  if (isInvalidInputError(error)) {
     sendProblem(res, {
       type: 'about:blank',
       title: 'Bad Request',
       status: 400,
-      detail: 'Invalid ObjectId format',
+      detail: 'Invalid input format',
       instance,
-      code: 'INVALID_OBJECT_ID',
+      code: 'INVALID_INPUT',
     });
     return;
   }
@@ -111,9 +106,32 @@ export const errorHandle = (
 
 const isDuplicateKeyError = (
   error: unknown
-): error is { code: number; keyValue?: Record<string, unknown> } => {
+): error is {
+  code: string;
+  detail?: string;
+  table?: string;
+  constraint?: string;
+} => {
   if (!error || typeof error !== 'object') return false;
-  return 'code' in error && (error as { code?: number }).code === 11000;
+  const err = error as { code?: string };
+  return 'code' in err && (err.code === '23505' || err.code === '23503');
+};
+
+const extractDuplicateDetail = (error: {
+  code: string;
+  detail?: string;
+  constraint?: string;
+}): string | null => {
+  if (error.detail) return error.detail;
+  if (error.constraint)
+    return `Duplicate value for constraint: ${error.constraint}`;
+  return null;
+};
+
+const isInvalidInputError = (error: unknown): error is { code: string } => {
+  if (!error || typeof error !== 'object') return false;
+  const err = error as { code?: string };
+  return 'code' in err && err.code === '22P02';
 };
 
 export const logErrors = (

@@ -12,7 +12,6 @@ function createMockRepository(): jest.Mocked<
     | 'findAll'
     | 'updateById'
     | 'deleteById'
-    | 'softDeleteById'
     | 'isEmailTaken'
   >
 > {
@@ -22,7 +21,6 @@ function createMockRepository(): jest.Mocked<
     findAll: jest.fn(),
     updateById: jest.fn(),
     deleteById: jest.fn(),
-    softDeleteById: jest.fn(),
     isEmailTaken: jest.fn(),
   };
 }
@@ -69,19 +67,10 @@ describe('UserService', () => {
     expect(mockEvents.emitUserCreated).toHaveBeenCalledWith(result);
   });
 
-  it('emits UserDeleted on hard delete', async () => {
+  it('emits UserDeleted on delete', async () => {
     mockRepo.deleteById.mockResolvedValue({ id: 'user-1' } as never);
 
     const result = await service.remove('user-1');
-
-    expect(result).toEqual({ id: 'user-1' });
-    expect(mockEvents.emitUserDeleted).toHaveBeenCalledWith('user-1');
-  });
-
-  it('emits UserDeleted on soft delete', async () => {
-    mockRepo.softDeleteById.mockResolvedValue({ id: 'user-1' } as never);
-
-    const result = await service.softDelete('user-1');
 
     expect(result).toEqual({ id: 'user-1' });
     expect(mockEvents.emitUserDeleted).toHaveBeenCalledWith('user-1');

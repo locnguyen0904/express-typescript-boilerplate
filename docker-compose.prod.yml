@@ -1,30 +1,27 @@
-networks:
-  backend-network:
-    driver: bridge
-
-secrets:
-  mongo_root_password:
-    file: ./secrets/mongo_root_password.txt
-  redis_password:
-    file: ./secrets/redis_password.txt
+version: '3.8'
+name: backend-template-prod
 
 services:
-  mongo:
+  postgres:
+    image: postgres:16-alpine
+    restart: always
     environment:
-      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongo_root_password
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB:-backend-template}
     volumes:
-      - ./compose/mongo/keys/keyfile.local:/etc/mongo-keyfile:ro
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'mongo:27017'}]}) }" | mongosh -u $${MONGO_INITDB_ROOT_USERNAME:-admin} -p "$$(cat /run/secrets/mongo_root_password)" --authenticationDatabase admin --quiet
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-backend-template}',
+        ]
       interval: 30s
       timeout: 10s
       start_period: 15s
-    secrets:
-      - mongo_root_password
     security_opt:
       - no-new-privileges:true
-    cap_drop:
-      - ALL
     deploy:
       resources:
         limits:
@@ -41,21 +38,15 @@ services:
         max-file: '3'
 
   redis:
-    command: sh -c 'redis-server --requirepass "$$(cat /run/secrets/redis_password)" --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru'
+    image: redis:7-alpine
+    restart: always
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-changeme} --maxmemory 256mb --maxmemory-policy allkeys-lru
     healthcheck:
-      test:
-        [
-          'CMD-SHELL',
-          'REDISCLI_AUTH=$$(cat /run/secrets/redis_password) redis-cli ping',
-        ]
+      test: ['CMD', 'redis-cli', '-a', '${REDIS_PASSWORD:-changeme}', 'ping']
       interval: 30s
       timeout: 10s
-    secrets:
-      - redis_password
     security_opt:
       - no-new-privileges:true
-    cap_drop:
-      - ALL
     deploy:
       resources:
         limits:
@@ -73,18 +64,19 @@ services:
 
   backend:
     build:
+      context: .
+      dockerfile: compose/backend/Dockerfile
       target: production
-    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-locnguyen}/backend-template:latest
-    env_file:
-      - .env.prod
-    healthcheck:
-      interval: 30s
-      timeout: 10s
-      start_period: 30s
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-locnguyen}/express-typescript-boilerplate:latest
+    restart: always
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     security_opt:
       - no-new-privileges:true
-    cap_drop:
-      - ALL
     read_only: true
     tmpfs:
       - /tmp
@@ -118,8 +110,6 @@ services:
         condition: service_healthy
     security_opt:
       - no-new-privileges:true
-    cap_drop:
-      - ALL
     cap_add:
       - NET_BIND_SERVICE
     read_only: true
@@ -141,3 +131,10 @@ services:
       options:
         max-size: '10m'
         max-file: '3'
+
+volumes:
+  postgres_data:
+
+networks:
+  backend-network:
+    driver: bridge

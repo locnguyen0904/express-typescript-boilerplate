@@ -1,26 +1,41 @@
-import { Repository } from '@/core';
+import { eq } from 'drizzle-orm';
 
-import User, { IUser } from './user.model';
+import { Repository } from '@/core';
+import { users } from '@/db/schema';
+import { db } from '@/services/database.service';
+
+import { IUser } from './user.interface';
 
 export class UserRepository extends Repository<IUser> {
   constructor() {
-    super(User);
+    super(users);
   }
 
   async findByEmail(email: string): Promise<IUser | null> {
-    return this.findOne({ email });
+    const [result] = await db
+      .select()
+      .from(this.table)
+      .where(eq(users.email, email));
+    return (result as IUser) ?? null;
   }
 
   async findByEmailWithPassword(email: string): Promise<IUser | null> {
-    const result = await this.model.findOne({ email }).select('+password');
-    return result ? (result.toObject() as IUser) : null;
+    const [result] = await db
+      .select()
+      .from(this.table)
+      .where(eq(users.email, email));
+    return (result as IUser) ?? null;
   }
 
   async isEmailTaken(email: string, excludeUserId?: string): Promise<boolean> {
-    const filter: Record<string, unknown> = { email };
     if (excludeUserId) {
-      filter._id = { $ne: excludeUserId };
+      const [result] = await db
+        .select({ id: users.id })
+        .from(this.table)
+        .where(eq(users.email, email));
+      return !!result && result.id !== excludeUserId;
     }
-    return this.exists(filter);
+
+    return this.exists({ email });
   }
 }

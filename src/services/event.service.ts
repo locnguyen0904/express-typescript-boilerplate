@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 
-import { IUser } from '@/api/users/user.model';
+import { IUser } from '@/api/users/user.interface';
 
 export const EventNames = {
   UserCreated: 'user.created',

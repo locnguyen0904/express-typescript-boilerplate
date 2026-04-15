@@ -1,5 +1,15 @@
 /** @type {import('plop').NodePlopAPI} */
 export default function (plop) {
+  plop.setHelper('pluralCamelCase', (text) => {
+    const name = plop.getHelper('camelCase')(text);
+    return name + 's';
+  });
+
+  plop.setHelper('pluralSnakeCase', (text) => {
+    const name = plop.getHelper('snakeCase')(text);
+    return name + 's';
+  });
+
   plop.setGenerator('module', {
     description: 'Generate a new API module (CSRM pattern)',
     prompts: [
@@ -16,11 +26,17 @@ export default function (plop) {
       },
     ],
     actions: [
-      // Model
+      // Drizzle Schema
       {
         type: 'add',
-        path: 'src/api/{{kebabCase name}}/{{kebabCase name}}.model.ts',
-        templateFile: 'plop-templates/model.ts.hbs',
+        path: 'src/db/schema/{{kebabCase name}}s.ts',
+        templateFile: 'plop-templates/schema.ts.hbs',
+      },
+      // Interface (TypeScript type definitions)
+      {
+        type: 'add',
+        path: 'src/api/{{kebabCase name}}/{{kebabCase name}}.interface.ts',
+        templateFile: 'plop-templates/interface.ts.hbs',
       },
       // Repository
       {
@@ -76,6 +92,14 @@ export default function (plop) {
         path: 'src/api/index.ts',
         pattern: /router\.use\('\/health', health\);/,
         template: "router.use('/{{kebabCase name}}s', {{camelCase name}});",
+      },
+      // Register schema in db/schema/index.ts
+      {
+        type: 'append',
+        path: 'src/db/schema/index.ts',
+        pattern: /\/\/ Register new schemas above this line/,
+        template:
+          "export { {{pluralCamelCase name}} } from './{{kebabCase name}}s';",
       },
     ],
   });

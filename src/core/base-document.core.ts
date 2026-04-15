@@ -1,8 +1,5 @@
-import { Document } from 'mongoose';
-
-export interface BaseDocument extends Document {
+export interface BaseDocument {
   id: string;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt?: Date;
 }

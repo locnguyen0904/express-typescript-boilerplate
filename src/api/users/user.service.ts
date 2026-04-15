@@ -1,6 +1,6 @@
-import { IUser } from '@/api/users/user.model';
+import { IUser } from '@/api/users/user.interface';
 import { UserRepository } from '@/api/users/user.repository';
-import { BadRequestError, NotFoundError } from '@/core';
+import { BadRequestError, NotFoundError, PaginatedResult } from '@/core';
 import EventService from '@/services/event.service';
 
 export default class UserService {
@@ -22,7 +22,9 @@ export default class UserService {
     return this.userRepository.findById(id);
   }
 
-  async findAll(query: Record<string, unknown> = {}) {
+  async findAll(
+    query: Record<string, unknown> = {}
+  ): Promise<PaginatedResult<IUser>> {
     return this.userRepository.findAll(query);
   }
 
@@ -42,18 +44,6 @@ export default class UserService {
       this.eventService.emitUserDeleted(deleted.id);
     }
     return deleted;
-  }
-
-  async softDelete(id: string): Promise<IUser | null> {
-    const deleted = await this.userRepository.softDeleteById(id);
-    if (deleted) {
-      this.eventService.emitUserDeleted(deleted.id);
-    }
-    return deleted;
-  }
-
-  async restore(id: string): Promise<IUser | null> {
-    return this.userRepository.restoreById(id);
   }
 
   async findByEmail(email: string): Promise<IUser | null> {

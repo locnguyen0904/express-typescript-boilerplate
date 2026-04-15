@@ -51,11 +51,11 @@ docker compose down -v
 cp .env.prod.example .env.prod
 ```
 
-2. Edit `.env.prod` with your production values:
+1. Edit `.env.prod` with your production values:
    - Set a secure JWT secret (at least 32 characters)
    - Update DATABASE_URL if using external database
 
-3. Generate MongoDB keyfile:
+2. Generate MongoDB keyfile:
 
 ```bash
 npm run generate:mongo-key
@@ -69,7 +69,7 @@ npm run generate:mongo-key
 >
 > This is not required on Docker Desktop (macOS/Windows) which handles file permissions transparently.
 
-4. Set up Cloudflare Origin Certificate:
+1. Set up Cloudflare Origin Certificate:
    1. In Cloudflare dashboard, go to SSL/TLS and set encryption mode to **Full (strict)**
    2. Go to SSL/TLS > Origin Server > Create Certificate
    3. Save the certificate and private key to:
@@ -85,7 +85,7 @@ chmod 600 compose/nginx/ssl/*.pem
 - Private key: `compose/nginx/ssl/key.pem`
 - Origin Certificates last up to 15 years
 
-5. Create secret files for production passwords:
+1. Create secret files for production passwords:
 
 ```bash
 mkdir -p secrets

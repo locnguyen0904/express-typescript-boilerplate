@@ -1,8 +1,7 @@
-import { PaginateResult } from 'mongoose';
-
+import { PaginatedResult } from '@/core';
 import { RedisService } from '@/services';
 
-import { IExample } from './example.model';
+import { IExample } from './example.interface';
 import { ExampleRepository } from './example.repository';
 
 export default class ExampleService {
@@ -27,13 +26,13 @@ export default class ExampleService {
 
   async findAll(
     query: Record<string, unknown> = {}
-  ): Promise<PaginateResult<IExample>> {
+  ): Promise<PaginatedResult<IExample>> {
     if (!this.redis.isConnected) {
       return this.exampleRepository.findAll(query);
     }
 
     const cacheKey = `examples:list:${JSON.stringify(query)}`;
-    const cached = await this.redis.get<PaginateResult<IExample>>(cacheKey);
+    const cached = await this.redis.get<PaginatedResult<IExample>>(cacheKey);
 
     if (cached) {
       return cached;
@@ -58,21 +57,5 @@ export default class ExampleService {
       await this.invalidateListCache();
     }
     return deleted;
-  }
-
-  async softDelete(id: string): Promise<IExample | null> {
-    const deleted = await this.exampleRepository.softDeleteById(id);
-    if (deleted) {
-      await this.invalidateListCache();
-    }
-    return deleted;
-  }
-
-  async restore(id: string): Promise<IExample | null> {
-    const restored = await this.exampleRepository.restoreById(id);
-    if (restored) {
-      await this.invalidateListCache();
-    }
-    return restored;
   }
 }

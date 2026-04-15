@@ -43,9 +43,7 @@ export default class ExampleController {
   }
 
   async delete(req: Request, res: Response): Promise<void> {
-    const example = await this.exampleService.softDelete(
-      req.params.id as string
-    );
+    const example = await this.exampleService.remove(req.params.id as string);
     if (!example) {
       throw new NotFoundError('Example not found');
     }

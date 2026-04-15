@@ -1,7 +1,9 @@
+import { eq } from 'drizzle-orm';
 import request from 'supertest';
 
-import Example from '@/api/examples/example.model';
 import app from '@/app';
+import { examples } from '@/db/schema';
+import { db } from '@/services/database.service';
 
 import {
   authRequest,
@@ -22,7 +24,7 @@ async function seedExamples(count = 3) {
     title: `Example ${i + 1}`,
     content: `Content for example ${i + 1}`,
   }));
-  return Example.insertMany(docs);
+  return db.insert(examples).values(docs).returning();
 }
 
 describe('Examples API (E2E)', () => {
@@ -126,9 +128,7 @@ describe('Examples API (E2E)', () => {
     it('should return example by id (no auth needed)', async () => {
       const [example] = await seedExamples(1);
 
-      const res = await request(app).get(
-        `/api/v1/examples/${example._id.toString()}`
-      );
+      const res = await request(app).get(`/api/v1/examples/${example.id}`);
 
       expect(res.status).toBe(200);
       expect(res.body.data.title).toBe('Example 1');
@@ -157,7 +157,7 @@ describe('Examples API (E2E)', () => {
       const [example] = await seedExamples(1);
 
       const res = await authRequest(token)
-        .put(`/api/v1/examples/${example._id.toString()}`)
+        .put(`/api/v1/examples/${example.id}`)
         .send({ title: 'Updated Title' });
 
       expect(res.status).toBe(200);
@@ -181,7 +181,7 @@ describe('Examples API (E2E)', () => {
       const [example] = await seedExamples(1);
 
       const res = await authRequest(token)
-        .put(`/api/v1/examples/${example._id.toString()}`)
+        .put(`/api/v1/examples/${example.id}`)
         .send({ title: 'Nope' });
 
       expect(res.status).toBe(403);
@@ -196,19 +196,21 @@ describe('Examples API (E2E)', () => {
       const [example] = await seedExamples(1);
 
       const res = await authRequest(token).delete(
-        `/api/v1/examples/${example._id.toString()}`
+        `/api/v1/examples/${example.id}`
       );
 
       expect(res.status).toBe(200);
 
-      // Should not appear in normal queries
-      const found = await Example.findById(example._id);
-      expect(found).toBeNull();
+      const [found] = await db
+        .select()
+        .from(examples)
+        .where(eq(examples.id, example.id));
+      expect(found).toBeUndefined();
     });
 
     it('should return 404 for non-existent id', async () => {
       const { token } = await loginAsAdmin();
-      const fakeId = '507f1f77bcf86cd799439011';
+      const fakeId = '00000000-0000-0000-0000-000000000000';
 
       const res = await authRequest(token).delete(`/api/v1/examples/${fakeId}`);
 
@@ -218,9 +220,7 @@ describe('Examples API (E2E)', () => {
     it('should deny access without authentication', async () => {
       const [example] = await seedExamples(1);
 
-      const res = await request(app).delete(
-        `/api/v1/examples/${example._id.toString()}`
-      );
+      const res = await request(app).delete(`/api/v1/examples/${example.id}`);
 
       expect(res.status).toBe(401);
     });

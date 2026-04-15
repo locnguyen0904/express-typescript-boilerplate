@@ -5,7 +5,7 @@ import { redisService } from '@/container';
 
 import app from './app';
 import { initializeJobs, shutdownJobs } from './jobs';
-import { logger, mongoose } from './services';
+import { database, logger } from './services';
 
 const PORT = config.port || 3000;
 const SHUTDOWN_TIMEOUT = 30000;
@@ -27,7 +27,7 @@ async function gracefulShutdown(
 
     await Promise.all([
       shutdownJobs(),
-      mongoose.disconnectDB(),
+      database.disconnectDB(),
       redisService.disconnect(),
     ]);
 
@@ -64,7 +64,7 @@ function initGracefulShutdown(server: http.Server): void {
 
 async function bootstrap(): Promise<void> {
   try {
-    await mongoose.connectDB();
+    await database.connectDB();
     await redisService.connect();
 
     if (config.features.jobsEnabled) {

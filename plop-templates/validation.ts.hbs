@@ -5,7 +5,6 @@ import { registry } from '@/config/openapi.config';
 export const create{{pascalCase name}}Schema = registry.register(
   'Create{{pascalCase name}}',
   z.object({
-    // TODO: Add your validation fields here
     name: z.string().openapi({ example: 'My {{pascalCase name}}' }),
   })
 );
@@ -13,7 +12,6 @@ export const create{{pascalCase name}}Schema = registry.register(
 export const update{{pascalCase name}}Schema = registry.register(
   'Update{{pascalCase name}}',
   z.object({
-    // TODO: Add your update validation fields here
     name: z.string().optional().openapi({ example: 'Updated {{pascalCase name}}' }),
   })
 );

@@ -1,13 +1,21 @@
 import './health.doc';
 
 import { Request, Response, Router } from 'express';
-import mongoose from 'mongoose';
 
 import { config } from '@/config';
 import { redisService } from '@/container';
+import { pool } from '@/services/database.service';
 
 export const healthHandler = async (_req: Request, res: Response) => {
-  const dbReady = mongoose.connection.readyState === 1;
+  let dbReady = false;
+  try {
+    const client = await pool.connect();
+    client.release();
+    dbReady = true;
+  } catch {
+    dbReady = false;
+  }
+
   const redisRequired = config.redis.enabled;
   const redisReady = redisRequired ? redisService.isConnected : true;
   const allHealthy = dbReady && redisReady;

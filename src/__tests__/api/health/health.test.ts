@@ -1,5 +1,3 @@
-import mongoose from 'mongoose';
-
 const mockConfig = {
   redis: {
     enabled: true,
@@ -10,6 +8,12 @@ const mockRedisService = {
   isConnected: false,
 };
 
+const mockPool = {
+  connect: jest.fn().mockResolvedValue({
+    release: jest.fn(),
+  }),
+};
+
 jest.mock('@/config', () => ({
   config: mockConfig,
 }));
@@ -18,11 +22,16 @@ jest.mock('@/container', () => ({
   redisService: mockRedisService,
 }));
 
+jest.mock('@/services/database.service', () => ({
+  db: {},
+  pool: mockPool,
+  connectDB: jest.fn(),
+  disconnectDB: jest.fn(),
+}));
+
 import { healthHandler } from '@/api/health';
 
 describe('healthHandler', () => {
-  const originalReadyState = mongoose.connection.readyState;
-
   const createResponse = () => {
     let statusCode = 200;
     let body: unknown;
@@ -50,19 +59,10 @@ describe('healthHandler', () => {
   };
 
   beforeEach(() => {
+    jest.clearAllMocks();
     mockConfig.redis.enabled = true;
     mockRedisService.isConnected = false;
-    Object.defineProperty(mongoose.connection, 'readyState', {
-      value: 1,
-      configurable: true,
-    });
-  });
-
-  afterAll(() => {
-    Object.defineProperty(mongoose.connection, 'readyState', {
-      value: originalReadyState,
-      configurable: true,
-    });
+    mockPool.connect.mockResolvedValue({ release: jest.fn() });
   });
 
   it('returns 503 when Redis is required but unavailable', async () => {

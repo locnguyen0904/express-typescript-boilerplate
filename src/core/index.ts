@@ -2,7 +2,7 @@
 export type { BaseDocument } from './base-document.core';
 
 // Repository
-export type { LeanDoc } from './repository.core';
+export type { PaginatedResult, PaginationOptions } from './repository.core';
 export { Repository } from './repository.core';
 
 // Errors

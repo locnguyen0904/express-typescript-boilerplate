@@ -2,7 +2,7 @@ import { eventService } from '@/container';
 import { logger } from '@/services';
 import { EventNames } from '@/services/event.service';
 
-import { IUser } from './user.model';
+import { IUser } from './user.interface';
 
 const events = eventService;
 

@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/locnguyen0904/backend-template/branch/main/graph/badge.svg)](https://codecov.io/gh/locnguyen0904/backend-template)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](LICENSE)
 
-Production-ready Express.js + TypeScript + MongoDB backend template with best practices.
+Production-ready Express.js + TypeScript + PostgreSQL backend template with best practices.
 
 ## 🛠 Tech Stack
 
@@ -12,7 +12,7 @@ Production-ready Express.js + TypeScript + MongoDB backend template with best pr
 | ------------- | ----------------------------------------------- |
 | Runtime       | Node.js 24 + TypeScript 5                       |
 | Framework     | Express.js 5                                    |
-| Database      | MongoDB 8 + Mongoose                            |
+| Database      | PostgreSQL 16 + Drizzle ORM                     |
 | Cache         | Redis 7                                         |
 | Validation    | Zod 4                                           |
 | API Docs      | OpenAPI 3 (auto-generated)                      |
@@ -21,7 +21,7 @@ Production-ready Express.js + TypeScript + MongoDB backend template with best pr
 | Logging       | Pino (JSON stdout)                              |
 | Jobs          | BullMQ + Bull Board UI                          |
 | Observability | OpenTelemetry (opt-in)                          |
-| Testing       | Jest 30 + Supertest + mongodb-memory-server     |
+| Testing       | Jest 30 + Supertest                             |
 | Container     | Docker Compose                                  |
 
 ## ⚡ Quick Start
@@ -34,6 +34,12 @@ cp .env.example .env
 
 # Start all services
 docker compose up -d
+
+# Push database schema
+npm run db:push
+
+# Seed database
+npm run seed:dev
 
 # View logs
 docker compose logs -f backend
@@ -51,15 +57,16 @@ docker compose logs -f backend
 ## 🏗 Architecture
 
 ```
-Request → Routes → Controller → Service → Repository → Model → MongoDB
+Request → Routes → Controller → Service → Repository → Drizzle ORM → PostgreSQL
 ```
 
-| Layer      | File              | Responsibility                        |
-| ---------- | ----------------- | ------------------------------------- |
-| Controller | `*.controller.ts` | HTTP handling, call services          |
-| Service    | `*.service.ts`    | Business logic, uses repository       |
-| Repository | `*.repository.ts` | Data access, extends `Repository<T>`  |
-| Model      | `*.model.ts`      | Mongoose schema, TypeScript interface |
+| Layer      | File              | Responsibility                       |
+| ---------- | ----------------- | ------------------------------------ |
+| Controller | `*.controller.ts` | HTTP handling, call services         |
+| Service    | `*.service.ts`    | Business logic, uses repository      |
+| Repository | `*.repository.ts` | Data access, extends `Repository<T>` |
+| Model      | `*.interface.ts`      | TypeScript interface                 |
+| Schema     | `db/schema/*.ts`  | Drizzle table definitions            |
 
 ## 📁 Project Structure
 
@@ -70,15 +77,18 @@ src/
 │       ├── {resource}.controller.ts
 │       ├── {resource}.service.ts
 │       ├── {resource}.repository.ts
-│       ├── {resource}.model.ts
+│       ├── {resource}.interface.ts
 │       ├── {resource}.validation.ts
 │       ├── {resource}.doc.ts
 │       └── index.ts
 ├── core/                   # Repository base, Response classes, Errors
 ├── config/                 # Environment, OpenAPI config
-├── helpers/                # Utilities (Error handling)
+├── db/                     # Database
+│   ├── schema/             # Drizzle ORM schemas
+│   └── seeds/              # Database seed scripts
+├── helpers/                # Utilities (Error handling, Query builder)
 ├── middlewares/            # Auth, CSRF, logging, rate limiting
-├── services/               # Shared services (Redis, Logger, Events, TokenBlacklist)
+├── services/               # Shared services (Database, Redis, Logger, Events, TokenBlacklist)
 ├── jobs/                   # BullMQ queues and workers
 └── __tests__/              # Test files (mirrors src structure)
 ```
@@ -101,13 +111,22 @@ npm test                          # Run tests
 npm run test:coverage             # Tests with coverage
 npm run seed:dev                  # Seed database
 npm run generate                  # Generate new API module (Plop)
+
+# Database
+npm run db:generate               # Generate migration files
+npm run db:migrate                # Run migrations
+npm run db:push                   # Push schema to database (dev)
+npm run db:studio                 # Open Drizzle Studio
 ```
 
 ## 🔑 Environment Variables
 
 | Variable                        | Description                           | Required |
 | ------------------------------- | ------------------------------------- | -------- |
-| `DATABASE_URL`                  | MongoDB connection string             | Yes      |
+| `DATABASE_URL`                  | PostgreSQL connection string          | Yes      |
+| `POSTGRES_USER`                 | PostgreSQL username (for Docker)      | Yes      |
+| `POSTGRES_PASSWORD`             | PostgreSQL password (for Docker)      | Yes      |
+| `POSTGRES_DB`                   | PostgreSQL database name (for Docker) | Yes      |
 | `JWT_SECRET`                    | Secret for JWT signing                | Yes      |
 | `JWT_ACCESS_EXPIRATION_MINUTES` | Access token expiry (default: 30)     | No       |
 | `JWT_REFRESH_EXPIRATION_DAYS`   | Refresh token expiry (default: 30)    | No       |
@@ -123,12 +142,12 @@ npm run generate                  # Generate new API module (Plop)
 
 - 🔒 **Security:** Helmet, CSRF (double submit cookie), rate limiting, CORS, Argon2 password hashing, JWT token revocation
 - ✅ **Validation:** Zod schemas with auto-generated OpenAPI docs
-- 🗄️ **Database:** Pagination, soft delete, Redis caching
+- 🗄️ **Database:** Drizzle ORM with type-safe queries, pagination, soft delete, Redis caching
 - 🚨 **Errors:** RFC 9457 Problem Details (`application/problem+json`)
 - 📝 **Logging:** Pino (JSON stdout, 12-Factor compliant)
 - ⚙️ **Jobs:** BullMQ background queues with Bull Board monitoring UI
 - 📊 **Observability:** OpenTelemetry auto-instrumentation (opt-in)
-- 🧪 **Testing:** Jest with mongodb-memory-server (no external DB needed), 68 tests
+- 🧪 **Testing:** Jest + Supertest
 - 🛠️ **DX:** tsx hot reload, Plop module scaffolding, lint-staged, path aliases (`@/`)
 
 ## 🧩 Core vs Optional Modules
@@ -136,7 +155,7 @@ npm run generate                  # Generate new API module (Plop)
 ### Core by default
 
 - Express 5 + TypeScript app structure
-- MongoDB + Mongoose persistence
+- PostgreSQL + Drizzle ORM persistence
 - Zod validation + OpenAPI generation
 - Auth, error handling, logging, and HTTP middleware
 

@@ -1,76 +1,62 @@
-import mongoose from 'mongoose';
 import request from 'supertest';
 
-import User, { IUser, UserRole } from '@/api/users/user.model';
+import { IUser } from '@/api/users/user.interface';
 import app from '@/app';
+import { users } from '@/db/schema';
+import { connectDB, db, disconnectDB } from '@/services/database.service';
 
-// ──────────────────────────────────────────────
-// Test Data Constants
-// ──────────────────────────────────────────────
 export const TEST_ADMIN = {
   fullName: 'Admin User',
   email: 'admin@test.com',
   password: 'Admin@123456',
-  role: UserRole.Admin,
+  role: 'admin' as const,
 } as const;
 
 export const TEST_USER = {
   fullName: 'Regular User',
   email: 'user@test.com',
   password: 'User@123456',
-  role: UserRole.User,
+  role: 'user' as const,
 } as const;
 
-// ──────────────────────────────────────────────
-// Database Helpers
-// ──────────────────────────────────────────────
 export async function connectTestDB(): Promise<void> {
-  const uri = process.env.DATABASE_URL!;
-  if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(uri);
-  }
+  await connectDB();
 }
 
 export async function disconnectTestDB(): Promise<void> {
-  await mongoose.connection.dropDatabase();
-  await mongoose.disconnect();
+  await disconnectDB();
 }
 
 export async function clearDatabase(): Promise<void> {
-  const collections = mongoose.connection.collections;
-  for (const key of Object.keys(collections)) {
-    await collections[key].deleteMany({});
-  }
+  await db.delete(users);
 }
 
-// ──────────────────────────────────────────────
-// Seed Helpers
-// ──────────────────────────────────────────────
 export async function seedAdmin(): Promise<IUser> {
-  const user = new User({
-    fullName: TEST_ADMIN.fullName,
-    email: TEST_ADMIN.email,
-    password: TEST_ADMIN.password,
-    role: TEST_ADMIN.role,
-  });
-  await user.save();
-  return user.toObject() as IUser;
+  const result = await db
+    .insert(users)
+    .values({
+      fullName: TEST_ADMIN.fullName,
+      email: TEST_ADMIN.email,
+      password: TEST_ADMIN.password,
+      role: TEST_ADMIN.role,
+    })
+    .returning();
+  return result[0] as IUser;
 }
 
 export async function seedUser(): Promise<IUser> {
-  const user = new User({
-    fullName: TEST_USER.fullName,
-    email: TEST_USER.email,
-    password: TEST_USER.password,
-    role: TEST_USER.role,
-  });
-  await user.save();
-  return user.toObject() as IUser;
+  const result = await db
+    .insert(users)
+    .values({
+      fullName: TEST_USER.fullName,
+      email: TEST_USER.email,
+      password: TEST_USER.password,
+      role: TEST_USER.role,
+    })
+    .returning();
+  return result[0] as IUser;
 }
 
-// ──────────────────────────────────────────────
-// Auth Helpers
-// ──────────────────────────────────────────────
 interface LoginResponse {
   data: {
     user: IUser;
@@ -102,9 +88,6 @@ export async function loginAsUser(): Promise<{ token: string; user: IUser }> {
   return loginAs(TEST_USER.email, TEST_USER.password);
 }
 
-// ──────────────────────────────────────────────
-// Request Helpers
-// ──────────────────────────────────────────────
 export function authRequest(token: string) {
   return {
     get: (url: string) =>

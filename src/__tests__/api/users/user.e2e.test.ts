@@ -1,7 +1,9 @@
+import { eq } from 'drizzle-orm';
 import request from 'supertest';
 
-import User from '@/api/users/user.model';
 import app from '@/app';
+import { users } from '@/db/schema';
+import { db } from '@/services/database.service';
 
 import {
   authRequest,
@@ -126,11 +128,12 @@ describe('Users API (E2E)', () => {
   describe('GET /api/v1/users/:id', () => {
     it('should return user by id for admin', async () => {
       const { token } = await loginAsAdmin();
-      const user = await User.findOne({ email: TEST_USER.email }).lean();
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, TEST_USER.email));
 
-      const res = await authRequest(token).get(
-        `/api/v1/users/${user!._id.toString()}`
-      );
+      const res = await authRequest(token).get(`/api/v1/users/${user.id}`);
 
       expect(res.status).toBe(200);
       expect(res.body.data.email).toBe(TEST_USER.email);
@@ -138,7 +141,7 @@ describe('Users API (E2E)', () => {
 
     it('should return 404 for non-existent id', async () => {
       const { token } = await loginAsAdmin();
-      const fakeId = '507f1f77bcf86cd799439011';
+      const fakeId = '00000000-0000-0000-0000-000000000000';
 
       const res = await authRequest(token).get(`/api/v1/users/${fakeId}`);
 
@@ -151,10 +154,13 @@ describe('Users API (E2E)', () => {
   describe('PUT /api/v1/users/:id', () => {
     it('should update user for admin', async () => {
       const { token } = await loginAsAdmin();
-      const user = await User.findOne({ email: TEST_USER.email }).lean();
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, TEST_USER.email));
 
       const res = await authRequest(token)
-        .put(`/api/v1/users/${user!._id.toString()}`)
+        .put(`/api/v1/users/${user.id}`)
         .send({ fullName: 'Updated Name' });
 
       expect(res.status).toBe(200);
@@ -163,10 +169,13 @@ describe('Users API (E2E)', () => {
 
     it('should reject duplicate email on update', async () => {
       const { token } = await loginAsAdmin();
-      const user = await User.findOne({ email: TEST_USER.email }).lean();
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, TEST_USER.email));
 
       const res = await authRequest(token)
-        .put(`/api/v1/users/${user!._id.toString()}`)
+        .put(`/api/v1/users/${user.id}`)
         .send({ email: 'admin@test.com' });
 
       expect(res.status).toBe(400);
@@ -178,17 +187,20 @@ describe('Users API (E2E)', () => {
   describe('DELETE /api/v1/users/:id', () => {
     it('should soft delete user for admin', async () => {
       const { token } = await loginAsAdmin();
-      const user = await User.findOne({ email: TEST_USER.email }).lean();
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, TEST_USER.email));
 
-      const res = await authRequest(token).delete(
-        `/api/v1/users/${user!._id.toString()}`
-      );
+      const res = await authRequest(token).delete(`/api/v1/users/${user.id}`);
 
       expect(res.status).toBe(200);
 
-      // Should be soft deleted (not in normal query)
-      const deleted = await User.findOne({ email: TEST_USER.email }).lean();
-      expect(deleted).toBeNull();
+      const [deleted] = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, TEST_USER.email));
+      expect(deleted).toBeUndefined();
     });
   });
 });
