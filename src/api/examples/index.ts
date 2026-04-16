@@ -4,13 +4,14 @@ import { Router } from 'express';
 import validate from 'express-zod-safe';
 
 import { idParamSchema, listQuerySchema } from '@/common';
-import { exampleController } from '@/container';
+import { container, TOKENS } from '@/di';
 import { authorize, isAuth } from '@/middlewares';
 
+import ExampleController from './example.controller';
 import { createExampleSchema, updateExampleSchema } from './example.validation';
 
 const router: Router = Router();
-const controller = exampleController;
+const controller = container.get<ExampleController>(TOKENS.ExampleController);
 
 router.get(
   '/',

@@ -1,10 +1,10 @@
-import { eventService } from '@/container';
+import { container, TOKENS } from '@/di';
 import { logger } from '@/services';
-import { EventNames } from '@/services/event.service';
+import EventService, { EventNames } from '@/services/event.service';
 
 import { IUser } from './user.interface';
 
-const events = eventService;
+const events = container.get<EventService>(TOKENS.EventService);
 
 /**
  * User Created Event Handler

@@ -1,11 +1,14 @@
 import { Request, Response } from 'express';
+import { inject, injectable } from 'inversify';
 
 import AuthService from '@/api/auth/auth.service';
 import { SuccessResponse, UnAuthorizedError } from '@/core';
+import { TOKENS } from '@/di/tokens';
 import { decrypt, encrypt } from '@/helpers/crypto.helper';
 
+@injectable()
 export default class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(@inject(TOKENS.AuthService) private authService: AuthService) {}
 
   async login(req: Request, res: Response) {
     const { email, password } = req.body;

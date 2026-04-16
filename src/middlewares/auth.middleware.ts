@@ -2,8 +2,13 @@ import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 import { config } from '@/config';
-import { tokenBlacklistService } from '@/container';
 import { ForbiddenError, UnAuthorizedError } from '@/core';
+import { container, TOKENS } from '@/di';
+import TokenBlacklistService from '@/services/token-blacklist.service';
+
+const tokenBlacklistService = container.get<TokenBlacklistService>(
+  TOKENS.TokenBlacklistService
+);
 
 interface TokenPayload {
   sub: string;

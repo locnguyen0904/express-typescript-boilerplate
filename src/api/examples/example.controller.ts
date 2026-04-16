@@ -1,11 +1,17 @@
 import { Request, Response } from 'express';
+import { inject, injectable } from 'inversify';
 
 import { CREATED, LIST, NotFoundError, OK } from '@/core';
+import { TOKENS } from '@/di/tokens';
 
 import ExampleService from './example.service';
 
+@injectable()
 export default class ExampleController {
-  constructor(private readonly exampleService: ExampleService) {}
+  constructor(
+    @inject(TOKENS.ExampleService)
+    private readonly exampleService: ExampleService
+  ) {}
 
   async create(req: Request, res: Response): Promise<void> {
     const example = await this.exampleService.create(req.body);
@@ -21,13 +27,15 @@ export default class ExampleController {
   }
 
   async findAll(req: Request, res: Response): Promise<void> {
-    const result = await this.exampleService.findAll(req.query);
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 25;
+    const result = await this.exampleService.findAll(page, limit);
     new LIST({
-      data: result.docs,
-      total: result.totalDocs,
-      page: result.page,
-      pages: result.totalPages,
-      limit: result.limit,
+      data: result.data,
+      total: result.total,
+      page,
+      limit,
+      pages: Math.ceil(result.total / limit),
     }).send(res);
   }
 

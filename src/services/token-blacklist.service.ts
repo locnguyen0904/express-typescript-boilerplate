@@ -1,9 +1,16 @@
+import { inject, injectable } from 'inversify';
+
+import { TOKENS } from '@/di/tokens';
+
 import RedisService from './redis.service';
 
 const PREFIX = 'token:blacklist:';
 
+@injectable()
 export default class TokenBlacklistService {
-  constructor(private readonly redis: RedisService) {}
+  constructor(
+    @inject(TOKENS.RedisService) private readonly redis: RedisService
+  ) {}
 
   async revoke(jti: string, ttlSeconds: number): Promise<void> {
     if (!this.redis.isConnected || ttlSeconds <= 0) return;

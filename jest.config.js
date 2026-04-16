@@ -1,13 +1,17 @@
 module.exports = {
-  preset: 'ts-jest',
   testEnvironment: 'node',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
+  transform: {
+    '^.+\\.[jt]sx?$': 'ts-jest',
+  },
+  transformIgnorePatterns: ['node_modules/(?!(inversify|@inversifyjs)/)'],
   roots: ['<rootDir>/src'],
   testMatch: ['**/__tests__/**/*.test.ts'],
   globalSetup: '<rootDir>/src/__tests__/globalSetup.ts',
   globalTeardown: '<rootDir>/src/__tests__/globalTeardown.ts',
+  setupFiles: ['reflect-metadata'],
   setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
 
   // Coverage configuration

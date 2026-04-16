@@ -1,7 +1,12 @@
+import 'reflect-metadata';
+
 import http from 'http';
 
 import config from '@/config/env.config';
-import { redisService } from '@/container';
+import { container, TOKENS } from '@/di';
+import RedisService from '@/services/redis.service';
+
+const redisService = container.get<RedisService>(TOKENS.RedisService);
 
 import app from './app';
 import { initializeJobs, shutdownJobs } from './jobs';

@@ -1,9 +1,6 @@
-// Base
-export type { BaseDocument } from './base-document.core';
-
-// Repository
-export type { PaginatedResult, PaginationOptions } from './repository.core';
-export { Repository } from './repository.core';
+// Pagination
+export type { PaginatedResult } from './pagination.core';
+export { withPagination } from './pagination.core';
 
 // Errors
 export {

@@ -1,9 +1,11 @@
+import { injectable } from 'inversify';
 import Redis from 'ioredis';
 
 import { config } from '@/config';
 
 import logger from './logger.service';
 
+@injectable()
 export default class RedisService {
   private client: Redis | null = null;
 

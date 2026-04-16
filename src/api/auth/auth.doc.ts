@@ -16,7 +16,7 @@ const tokenResponseSchema = z.object({
 });
 
 const userResponseSchema = z.object({
-  _id: z.string().openapi({ example: '60d0fe4f5311236168a109ca' }),
+  id: z.uuid().openapi({ example: '550e8400-e29b-41d4-a716-446655440000' }),
   fullName: z.string().openapi({ example: 'John Doe' }),
   email: z.email().openapi({ example: 'john@example.com' }),
   role: z.enum(['admin', 'user']).openapi({ example: 'user' }),

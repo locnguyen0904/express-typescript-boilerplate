@@ -2,20 +2,20 @@ import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 import { config } from '@/config';
-import * as container from '@/container';
 import { ForbiddenError, UnAuthorizedError } from '@/core';
-import { authorize, isAuth } from '@/middlewares';
 
-jest.mock('@/container', () => ({
-  tokenBlacklistService: {
-    revoke: jest.fn(),
-    isRevoked: jest.fn(),
-  },
+// Must be declared before jest.mock — jest.fn() is available at hoist time
+const mockIsRevoked = jest.fn();
+const mockRevoke = jest.fn();
+
+jest.mock('@/di', () => ({
+  container: { get: () => ({ isRevoked: mockIsRevoked, revoke: mockRevoke }) },
+  TOKENS: { TokenBlacklistService: Symbol('mock') },
 }));
-
 jest.mock('jsonwebtoken');
 
-const mockBlacklist = jest.mocked(container).tokenBlacklistService;
+// Import after mocks are set up
+import { authorize, isAuth } from '@/middlewares';
 
 describe('Auth Middleware', () => {
   let mockRequest: Partial<Request>;
@@ -24,7 +24,7 @@ describe('Auth Middleware', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockBlacklist.isRevoked.mockResolvedValue(false);
+    mockIsRevoked.mockResolvedValue(false);
 
     mockRequest = { headers: {} };
     mockResponse = {};
@@ -78,11 +78,11 @@ describe('Auth Middleware', () => {
       };
       mockRequest.headers = { authorization: 'Bearer revoked' };
       (jwt.verify as jest.Mock).mockReturnValue(payload);
-      mockBlacklist.isRevoked.mockResolvedValue(true);
+      mockIsRevoked.mockResolvedValue(true);
 
       await isAuth(mockRequest as Request, mockResponse as Response, mockNext);
 
-      expect(mockBlacklist.isRevoked).toHaveBeenCalledWith('revoked-jti');
+      expect(mockIsRevoked).toHaveBeenCalledWith('revoked-jti');
       expect(mockNext).toHaveBeenCalledWith(expect.any(UnAuthorizedError));
     });
 
@@ -98,7 +98,7 @@ describe('Auth Middleware', () => {
 
       await isAuth(mockRequest as Request, mockResponse as Response, mockNext);
 
-      expect(mockBlacklist.isRevoked).toHaveBeenCalledWith('valid-jti');
+      expect(mockIsRevoked).toHaveBeenCalledWith('valid-jti');
       expect(mockRequest.user).toEqual(payload);
       expect(mockNext).toHaveBeenCalledWith();
     });

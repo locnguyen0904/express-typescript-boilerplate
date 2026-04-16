@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response as ExpressResponse } from 'express';
-import { ZodError } from 'zod';
 
 import { AppError, InternalServerError, NotFoundError } from '@/core';
 import { logger } from '@/services';
@@ -38,23 +37,6 @@ export const errorHandle = (
       instance,
       code: typeof error.code === 'string' ? error.code : undefined,
       ...(includeStack && error.stack ? { stack: error.stack } : {}),
-    });
-    return;
-  }
-
-  if (error instanceof ZodError) {
-    const errors = error.issues.map((issue) => ({
-      message: `${issue.path.join('.')}: ${issue.message}`,
-      code: issue.code,
-    }));
-    sendProblem(res, {
-      type: 'about:blank',
-      title: 'Bad Request',
-      status: 400,
-      detail: 'Invalid request data. Please review the request and try again.',
-      instance,
-      code: 'VALIDATION_ERROR',
-      errors,
     });
     return;
   }

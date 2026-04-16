@@ -18,8 +18,9 @@ jest.mock('@/config', () => ({
   config: mockConfig,
 }));
 
-jest.mock('@/container', () => ({
-  redisService: mockRedisService,
+jest.mock('@/di', () => ({
+  container: { get: () => mockRedisService },
+  TOKENS: { RedisService: Symbol('mock') },
 }));
 
 jest.mock('@/services/database.service', () => ({

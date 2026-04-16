@@ -185,7 +185,7 @@ describe('Users API (E2E)', () => {
   // ──────────────── DELETE ────────────────
 
   describe('DELETE /api/v1/users/:id', () => {
-    it('should soft delete user for admin', async () => {
+    it('should delete user for admin', async () => {
       const { token } = await loginAsAdmin();
       const [user] = await db
         .select()

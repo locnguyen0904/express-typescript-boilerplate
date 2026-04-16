@@ -2,7 +2,10 @@ import { Request } from 'express';
 import rateLimit, { Options } from 'express-rate-limit';
 import { RedisStore } from 'rate-limit-redis';
 
-import { redisService } from '@/container';
+import { container, TOKENS } from '@/di';
+import RedisService from '@/services/redis.service';
+
+const redisService = container.get<RedisService>(TOKENS.RedisService);
 
 let redisStore: RedisStore | undefined;
 

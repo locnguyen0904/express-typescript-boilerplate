@@ -4,11 +4,13 @@ import { Router } from 'express';
 import validate from 'express-zod-safe';
 
 import { loginSchema } from '@/api/auth/auth.validation';
-import { authController } from '@/container';
+import { container, TOKENS } from '@/di';
 import { authLimiter } from '@/middlewares';
 
+import AuthController from './auth.controller';
+
 const router = Router();
-const controller = authController;
+const controller = container.get<AuthController>(TOKENS.AuthController);
 
 router.post(
   '/login',

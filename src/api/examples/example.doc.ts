@@ -25,8 +25,7 @@ registry.registerPath({
   path: '/examples',
   tags: ['Examples'],
   summary: 'Get all examples',
-  description:
-    'Returns active examples. Use `includeDeleted=true` to include soft-deleted records.',
+  description: 'Returns a paginated list of examples.',
   request: {
     query: listQuerySchema,
   },
@@ -57,7 +56,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: dataResponseSchema(
-            createExampleSchema.extend({ _id: z.string() })
+            createExampleSchema.extend({ id: z.string().uuid() })
           ),
         },
       },
@@ -95,7 +94,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: dataResponseSchema(
-            createExampleSchema.extend({ _id: z.string() })
+            createExampleSchema.extend({ id: z.string().uuid() })
           ),
         },
       },
@@ -142,7 +141,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: dataResponseSchema(
-            createExampleSchema.extend({ _id: z.string() })
+            createExampleSchema.extend({ id: z.string().uuid() })
           ),
         },
       },
@@ -179,8 +178,8 @@ registry.registerPath({
   method: 'delete',
   path: '/examples/{id}',
   tags: ['Examples'],
-  summary: 'Soft delete an example',
-  description: 'Marks the example as deleted without removing it from storage.',
+  summary: 'Delete an example',
+  description: 'Permanently removes the example from the database.',
   security,
   request: {
     params: idParamSchema,
@@ -191,7 +190,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: dataResponseSchema(
-            createExampleSchema.extend({ _id: z.string() })
+            createExampleSchema.extend({ id: z.string().uuid() })
           ),
         },
       },

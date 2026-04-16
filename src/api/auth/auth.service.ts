@@ -1,20 +1,24 @@
 import { randomUUID } from 'crypto';
 
 import argon2 from 'argon2';
+import { inject, injectable } from 'inversify';
 import jwt from 'jsonwebtoken';
 
 import { IUser } from '@/api/users/user.interface';
 import UserService from '@/api/users/user.service';
 import { config } from '@/config';
 import { UnAuthorizedError } from '@/core';
+import { TOKENS } from '@/di/tokens';
 import logger from '@/services/logger.service';
 import TokenBlacklistService from '@/services/token-blacklist.service';
 
 import { AuthTokens } from './auth.interface';
 
+@injectable()
 export default class AuthService {
   constructor(
-    private userService: UserService,
+    @inject(TOKENS.UserService) private userService: UserService,
+    @inject(TOKENS.TokenBlacklistService)
     private tokenBlacklist: TokenBlacklistService
   ) {}
 

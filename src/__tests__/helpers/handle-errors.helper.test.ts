@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import { ZodError } from 'zod';
 
 import { BadRequestError, NotFoundError } from '@/core';
 import {
@@ -95,38 +94,6 @@ describe('Handle Errors Helper', () => {
       const jsonCall = (mockResponse.json as jest.Mock).mock
         .calls[0][0] as Record<string, unknown>;
       expect(jsonCall.stack).toBeUndefined();
-    });
-
-    it('handles ZodError with RFC 9457 format', () => {
-      const zodError = new ZodError([
-        {
-          code: 'invalid_type',
-          expected: 'string',
-          path: ['email'],
-          message: 'Expected string, received number',
-        } as never,
-      ]);
-
-      errorHandle(
-        zodError,
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
-
-      expect(mockResponse.status).toHaveBeenCalledWith(400);
-      expect(mockResponse.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: 'Bad Request',
-          code: 'VALIDATION_ERROR',
-          errors: expect.arrayContaining([
-            expect.objectContaining({
-              message: 'email: Expected string, received number',
-              code: 'invalid_type',
-            }),
-          ]),
-        })
-      );
     });
 
     it('handles PostgreSQL duplicate key error (23505)', () => {

@@ -1,20 +1,25 @@
+import { inject, injectable } from 'inversify';
+
 import { PaginatedResult } from '@/core';
+import { TOKENS } from '@/di/tokens';
 import { RedisService } from '@/services';
 
-import { IExample } from './example.interface';
+import { IExample, NewExample } from './example.interface';
 import { ExampleRepository } from './example.repository';
 
+@injectable()
 export default class ExampleService {
   constructor(
+    @inject(TOKENS.ExampleRepository)
     private readonly exampleRepository: ExampleRepository,
-    private readonly redis: RedisService
+    @inject(TOKENS.RedisService) private readonly redis: RedisService
   ) {}
 
   private async invalidateListCache() {
     await this.redis.delByPrefix('examples:list:');
   }
 
-  async create(data: Partial<IExample>): Promise<IExample> {
+  async create(data: NewExample): Promise<IExample> {
     const created = await this.exampleRepository.create(data);
     await this.invalidateListCache();
     return created;
@@ -25,25 +30,29 @@ export default class ExampleService {
   }
 
   async findAll(
-    query: Record<string, unknown> = {}
+    page?: number,
+    pageSize?: number
   ): Promise<PaginatedResult<IExample>> {
     if (!this.redis.isConnected) {
-      return this.exampleRepository.findAll(query);
+      return this.exampleRepository.findAll(page, pageSize);
     }
 
-    const cacheKey = `examples:list:${JSON.stringify(query)}`;
+    const cacheKey = `examples:list:${page}:${pageSize}`;
     const cached = await this.redis.get<PaginatedResult<IExample>>(cacheKey);
 
     if (cached) {
       return cached;
     }
 
-    const result = await this.exampleRepository.findAll(query);
+    const result = await this.exampleRepository.findAll(page, pageSize);
     await this.redis.set(cacheKey, result, 300);
     return result;
   }
 
-  async update(id: string, data: Partial<IExample>): Promise<IExample | null> {
+  async update(
+    id: string,
+    data: Partial<NewExample>
+  ): Promise<IExample | null> {
     const updated = await this.exampleRepository.updateById(id, data);
     if (updated) {
       await this.invalidateListCache();

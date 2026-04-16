@@ -5,6 +5,8 @@
     "moduleResolution": "nodenext",
     "isolatedModules": true,
     "strict": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

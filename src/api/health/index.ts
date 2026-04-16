@@ -3,8 +3,11 @@ import './health.doc';
 import { Request, Response, Router } from 'express';
 
 import { config } from '@/config';
-import { redisService } from '@/container';
+import { container, TOKENS } from '@/di';
 import { pool } from '@/services/database.service';
+import RedisService from '@/services/redis.service';
+
+const redisService = container.get<RedisService>(TOKENS.RedisService);
 
 export const healthHandler = async (_req: Request, res: Response) => {
   let dbReady = false;

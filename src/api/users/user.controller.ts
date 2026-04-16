@@ -1,10 +1,15 @@
 import { Request, Response } from 'express';
+import { inject, injectable } from 'inversify';
 
 import UserService from '@/api/users/user.service';
 import { CREATED, LIST, NotFoundError, OK } from '@/core';
+import { TOKENS } from '@/di/tokens';
 
+@injectable()
 export default class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    @inject(TOKENS.UserService) private readonly userService: UserService
+  ) {}
 
   async create(req: Request, res: Response): Promise<void> {
     const user = await this.userService.create(req.body);
@@ -20,13 +25,15 @@ export default class UserController {
   }
 
   async findAll(req: Request, res: Response): Promise<void> {
-    const result = await this.userService.findAll(req.query);
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 25;
+    const result = await this.userService.findAll(page, limit);
     new LIST({
-      data: result.docs,
-      total: result.totalDocs,
-      page: result.page,
-      pages: result.totalPages,
-      limit: result.limit,
+      data: result.data,
+      total: result.total,
+      page,
+      limit,
+      pages: Math.ceil(result.total / limit),
     }).send(res);
   }
 

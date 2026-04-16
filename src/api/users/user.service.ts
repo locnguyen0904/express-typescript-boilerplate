@@ -1,16 +1,21 @@
-import { IUser } from '@/api/users/user.interface';
+import { inject, injectable } from 'inversify';
+
+import { IUser, NewUser } from '@/api/users/user.interface';
 import { UserRepository } from '@/api/users/user.repository';
-import { BadRequestError, NotFoundError, PaginatedResult } from '@/core';
+import { BadRequestError, NotFoundError, type PaginatedResult } from '@/core';
+import { TOKENS } from '@/di/tokens';
 import EventService from '@/services/event.service';
 
+@injectable()
 export default class UserService {
   constructor(
+    @inject(TOKENS.UserRepository)
     private readonly userRepository: UserRepository,
-    private readonly eventService: EventService
+    @inject(TOKENS.EventService) private readonly eventService: EventService
   ) {}
 
-  async create(data: Partial<IUser>): Promise<IUser> {
-    if (await this.userRepository.isEmailTaken(data.email as string)) {
+  async create(data: NewUser): Promise<IUser> {
+    if (await this.userRepository.isEmailTaken(data.email)) {
       throw new BadRequestError('Email already taken');
     }
     const user = await this.userRepository.create(data);
@@ -23,12 +28,13 @@ export default class UserService {
   }
 
   async findAll(
-    query: Record<string, unknown> = {}
+    page?: number,
+    pageSize?: number
   ): Promise<PaginatedResult<IUser>> {
-    return this.userRepository.findAll(query);
+    return this.userRepository.findAll(page, pageSize);
   }
 
-  async update(id: string, data: Partial<IUser>): Promise<IUser | null> {
+  async update(id: string, data: Partial<NewUser>): Promise<IUser | null> {
     if (data.email) {
       const isTaken = await this.userRepository.isEmailTaken(data.email, id);
       if (isTaken) {

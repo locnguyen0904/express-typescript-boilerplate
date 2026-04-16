@@ -32,4 +32,4 @@ TEST*.xml
 secrets/
 compose/mongo/keys/
 compose/nginx/ssl/
-.claude
+.claude/settings.local.json

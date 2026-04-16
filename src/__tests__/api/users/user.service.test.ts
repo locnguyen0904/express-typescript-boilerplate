@@ -50,7 +50,11 @@ describe('UserService', () => {
     mockRepo.isEmailTaken.mockResolvedValue(true);
 
     await expect(
-      service.create({ email: 'taken@example.com' })
+      service.create({
+        fullName: 'Test User',
+        email: 'taken@example.com',
+        password: 'password123',
+      })
     ).rejects.toBeInstanceOf(BadRequestError);
   });
 
@@ -61,7 +65,11 @@ describe('UserService', () => {
       email: 'user@example.com',
     } as never);
 
-    const result = await service.create({ email: 'user@example.com' });
+    const result = await service.create({
+      fullName: 'Test User',
+      email: 'user@example.com',
+      password: 'password123',
+    });
 
     expect(result).toEqual({ id: 'user-1', email: 'user@example.com' });
     expect(mockEvents.emitUserCreated).toHaveBeenCalledWith(result);

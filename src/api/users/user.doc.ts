@@ -20,7 +20,10 @@ const bearerAuth = registry.registerComponent('securitySchemes', 'bearerAuth', {
 const security = [{ [bearerAuth.name]: [] }];
 
 const userResponseSchema = z.object({
-  _id: z.string().openapi({ example: '60d0fe4f5311236168a109ca' }),
+  id: z
+    .string()
+    .uuid()
+    .openapi({ example: '550e8400-e29b-41d4-a716-446655440000' }),
   fullName: z.string().openapi({ example: 'John Doe' }),
   email: z.email().openapi({ example: 'john@example.com' }),
   role: z.enum(['admin', 'user']).openapi({ example: 'user' }),
@@ -35,8 +38,7 @@ registry.registerPath({
   tags: ['Users'],
   summary: 'Get all users',
   security,
-  description:
-    'Returns active users. Use `includeDeleted=true` to include soft-deleted records.',
+  description: 'Returns a paginated list of users.',
   request: {
     query: listQuerySchema,
   },
@@ -224,8 +226,8 @@ registry.registerPath({
   method: 'delete',
   path: '/users/{id}',
   tags: ['Users'],
-  summary: 'Soft delete a user',
-  description: 'Marks the user as deleted without removing it from storage.',
+  summary: 'Delete a user',
+  description: 'Permanently removes the user from the database.',
   security,
   request: {
     params: idParamSchema,

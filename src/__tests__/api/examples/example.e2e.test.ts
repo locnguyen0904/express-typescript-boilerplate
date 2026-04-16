@@ -135,7 +135,7 @@ describe('Examples API (E2E)', () => {
     });
 
     it('should return 404 for non-existent id', async () => {
-      const fakeId = '507f1f77bcf86cd799439011';
+      const fakeId = '00000000-0000-0000-0000-000000000001';
 
       const res = await request(app).get(`/api/v1/examples/${fakeId}`);
 
@@ -167,7 +167,7 @@ describe('Examples API (E2E)', () => {
 
     it('should return 404 for non-existent id', async () => {
       const { token } = await loginAsAdmin();
-      const fakeId = '507f1f77bcf86cd799439011';
+      const fakeId = '00000000-0000-0000-0000-000000000001';
 
       const res = await authRequest(token)
         .put(`/api/v1/examples/${fakeId}`)
@@ -191,7 +191,7 @@ describe('Examples API (E2E)', () => {
   // ──────────────── DELETE ────────────────
 
   describe('DELETE /api/v1/examples/:id', () => {
-    it('should soft delete example when admin', async () => {
+    it('should delete example when admin', async () => {
       const { token } = await loginAsAdmin();
       const [example] = await seedExamples(1);
 

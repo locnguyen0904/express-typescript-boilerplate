@@ -2,8 +2,11 @@ import { Queue, Worker } from 'bullmq';
 import IORedis, { RedisOptions } from 'ioredis';
 
 import { config } from '@/config';
-import { redisService } from '@/container';
+import { container, TOKENS } from '@/di';
 import { logger } from '@/services';
+import RedisService from '@/services/redis.service';
+
+const redisService = container.get<RedisService>(TOKENS.RedisService);
 
 import { createEmailQueue } from './queues/email.queue';
 import { closeEmailWorker, createEmailWorker } from './workers/email.worker';
