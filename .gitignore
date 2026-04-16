@@ -9,15 +9,6 @@ coverage/
 .env
 .env.prod
 
-# Logs
-*.log
-logs/*
-!logs/.gitkeep
-
-# Uploads
-uploads/*
-!uploads/.gitkeep
-
 # IDE
 .idea/
 

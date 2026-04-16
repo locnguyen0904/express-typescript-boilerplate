@@ -45,8 +45,12 @@ services:
     build:
       context: .
       dockerfile: compose/backend/Dockerfile
+      target: development
     restart: unless-stopped
     env_file: .env
+    volumes:
+      - .:/home/app/backend-template
+      - /home/app/backend-template/node_modules
     depends_on:
       postgres:
         condition: service_healthy

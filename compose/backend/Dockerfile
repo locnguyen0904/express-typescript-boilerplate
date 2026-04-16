@@ -7,8 +7,11 @@ RUN addgroup -g 1001 app && \
 
 WORKDIR /home/app/backend-template
 
-COPY package*.json ./
+RUN chown app:app /home/app/backend-template
 
+COPY --chown=app:app package*.json ./
+
+# ─── Development ──────────────────────────────────────────────────────────────
 FROM base AS development
 
 USER app
@@ -19,27 +22,33 @@ EXPOSE 3000 9229
 
 CMD ["dumb-init", "npm", "run", "dev"]
 
+# ─── Builder ──────────────────────────────────────────────────────────────────
 FROM base AS builder
+
+USER app
 
 RUN npm ci
 
 COPY --chown=app:app . .
+
 RUN npm run build
 
+# ─── Production dependencies ──────────────────────────────────────────────────
 FROM base AS prod-dependencies
+
+USER app
 
 RUN npm ci --omit=dev --ignore-scripts \
     && find node_modules -type d -name '.cache' -exec rm -rf {} + 2>/dev/null || true
 
+# ─── Production ───────────────────────────────────────────────────────────────
 FROM base AS production
-
-WORKDIR /home/app/backend-template
 
 USER app
 
-COPY --from=prod-dependencies /home/app/backend-template/node_modules ./node_modules
-COPY --from=builder /home/app/backend-template/dist ./dist
-COPY package.json ./
+COPY --from=prod-dependencies --chown=app:app /home/app/backend-template/node_modules ./node_modules
+COPY --from=builder --chown=app:app /home/app/backend-template/dist ./dist
+COPY --chown=app:app package.json ./
 
 ENV NODE_ENV=production
 
@@ -48,4 +57,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
-CMD ["dumb-init", "node", "dist/server.js"]
+CMD ["dumb-init", "node", "--import", "./dist/instrumentation.js", "dist/server.js"]

@@ -16,11 +16,11 @@ router.post(
   '/login',
   authLimiter,
   validate({ body: loginSchema }),
-  controller.login.bind(controller)
+  controller.login
 );
 
-router.post('/refresh-token', controller.refreshToken.bind(controller));
+router.post('/refresh-token', controller.refreshToken);
 
-router.post('/logout', controller.logout.bind(controller));
+router.post('/logout', controller.logout);
 
 export default router;

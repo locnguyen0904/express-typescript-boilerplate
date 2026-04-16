@@ -18,35 +18,35 @@ router.get(
   isAuth,
   authorize('admin'),
   validate({ query: listQuerySchema }),
-  controller.findAll.bind(controller)
+  controller.findAll
 );
 router.get(
   '/:id',
   isAuth,
   authorize('admin'),
   validate({ params: idParamSchema }),
-  controller.findOne.bind(controller)
+  controller.findOne
 );
 router.post(
   '/',
   isAuth,
   authorize('admin'),
   validate({ body: createUserSchema }),
-  controller.create.bind(controller)
+  controller.create
 );
 router.put(
   '/:id',
   isAuth,
   authorize('admin'),
   validate({ params: idParamSchema, body: updateUserSchema }),
-  controller.update.bind(controller)
+  controller.update
 );
 router.delete(
   '/:id',
   isAuth,
   authorize('admin'),
   validate({ params: idParamSchema }),
-  controller.delete.bind(controller)
+  controller.delete
 );
 
 export default router;

@@ -1,6 +1,4 @@
-import 'reflect-metadata';
-
-import { Container } from 'inversify';
+import { Container, ResolutionContext } from 'inversify';
 
 import AuthController from '@/api/auth/auth.controller';
 import AuthService from '@/api/auth/auth.service';
@@ -17,6 +15,29 @@ import TokenBlacklistService from '@/services/token-blacklist.service';
 import { TOKENS } from './tokens';
 
 const container = new Container();
+
+const autoBindControllerMethods = <T extends object>(
+  _context: ResolutionContext,
+  instance: T
+): T => {
+  let proto = Object.getPrototypeOf(instance);
+
+  while (proto && proto !== Object.prototype) {
+    for (const key of Object.getOwnPropertyNames(proto)) {
+      if (key === 'constructor') continue;
+
+      const descriptor = Object.getOwnPropertyDescriptor(proto, key);
+      if (!descriptor || typeof descriptor.value !== 'function') continue;
+
+      const boundMethod = descriptor.value.bind(instance);
+      (instance as Record<string, unknown>)[key] = boundMethod;
+    }
+
+    proto = Object.getPrototypeOf(proto);
+  }
+
+  return instance;
+};
 
 // Infrastructure
 container
@@ -60,14 +81,17 @@ container
 container
   .bind<UserController>(TOKENS.UserController)
   .to(UserController)
-  .inSingletonScope();
+  .inSingletonScope()
+  .onActivation(autoBindControllerMethods);
 container
   .bind<ExampleController>(TOKENS.ExampleController)
   .to(ExampleController)
-  .inSingletonScope();
+  .inSingletonScope()
+  .onActivation(autoBindControllerMethods);
 container
   .bind<AuthController>(TOKENS.AuthController)
   .to(AuthController)
-  .inSingletonScope();
+  .inSingletonScope()
+  .onActivation(autoBindControllerMethods);
 
 export { container };

@@ -16,7 +16,7 @@
     "prettier:fix": "prettier --write './src/**/*.{js,ts}'",
     "seed:dev": "tsx src/db/seeds",
     "seed": "node dist/db/seeds",
-    "db:generate": "drizzle-kit generate",
+    "db:generate": "drizzle-kit generate --name=$npm_config_name",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
