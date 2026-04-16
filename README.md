@@ -1,30 +1,26 @@
-# 🚀 Backend Template
-
-[![CI](https://github.com/locnguyen0904/backend-template/actions/workflows/ci.yml/badge.svg)](https://github.com/locnguyen0904/backend-template/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/locnguyen0904/backend-template/branch/main/graph/badge.svg)](https://codecov.io/gh/locnguyen0904/backend-template)
-[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](LICENSE)
+# Backend Template
 
 Production-ready Express.js + TypeScript + PostgreSQL backend template with best practices.
 
-## 🛠 Tech Stack
+## Tech Stack
 
-| Layer         | Technology                                      |
-| ------------- | ----------------------------------------------- |
-| Runtime       | Node.js 24 + TypeScript 5                       |
-| Framework     | Express.js 5                                    |
-| Database      | PostgreSQL 16 + Drizzle ORM                     |
-| Cache         | Redis 7                                         |
-| Validation    | Zod 4                                           |
-| API Docs      | OpenAPI 3 (auto-generated)                      |
-| Auth          | JWT (access + refresh tokens, token revocation) |
-| DI            | Manual DI (composition root)                    |
-| Logging       | Pino (JSON stdout)                              |
-| Jobs          | BullMQ + Bull Board UI                          |
-| Observability | OpenTelemetry (opt-in)                          |
-| Testing       | Jest 30 + Supertest                             |
-| Container     | Docker Compose                                  |
+| Layer | Technology |
+|-------|-----------|
+| Runtime | Node.js 24 + TypeScript 5 |
+| Framework | Express.js 5 |
+| Database | PostgreSQL 16 + Drizzle ORM |
+| Cache | Redis 7 + ioredis |
+| Auth | JWT (access + refresh tokens, token revocation) |
+| Validation | Zod 4 + express-zod-safe |
+| API Docs | OpenAPI 3 (auto-generated via zod-to-openapi) |
+| DI | Inversify |
+| Logging | Pino (structured JSON) |
+| Jobs | BullMQ + Bull Board UI |
+| Security | Helmet, CORS, CSRF, rate limiting |
+| Testing | Jest 30 + Supertest |
+| Container | Docker Compose |
 
-## ⚡ Quick Start
+## Quick Start
 
 ```bash
 # Clone and setup
@@ -32,156 +28,167 @@ git clone <repo-url> my-project
 cd my-project
 cp .env.example .env
 
-# Start all services
-docker compose up -d
+# Start PostgreSQL and Redis
+npm run docker:up
 
-# Push database schema
+# Install dependencies
+npm install
+
+# Push database schema and seed
 npm run db:push
-
-# Seed database
 npm run seed:dev
 
-# View logs
-docker compose logs -f backend
+# Start dev server
+npm run dev
 ```
 
-**🌐 Access points:**
+The API runs at `http://localhost:3000`. OpenAPI docs are available at `http://localhost:3000/api-docs`.
 
-| Service             | URL                                |
-| ------------------- | ---------------------------------- |
-| Backend API         | http://localhost:3000/api/v1       |
-| Swagger UI          | http://localhost:3000/api-docs     |
-| Health Check        | http://localhost:3000/health       |
-| Bull Board (Queues) | http://localhost:3000/admin/queues |
-
-## 🏗 Architecture
-
-```
-Request → Routes → Controller → Service → Repository → Drizzle ORM → PostgreSQL
-```
-
-| Layer      | File              | Responsibility                       |
-| ---------- | ----------------- | ------------------------------------ |
-| Controller | `*.controller.ts` | HTTP handling, call services         |
-| Service    | `*.service.ts`    | Business logic, uses repository      |
-| Repository | `*.repository.ts` | Data access, extends `Repository<T>` |
-| Model      | `*.interface.ts`      | TypeScript interface                 |
-| Schema     | `db/schema/*.ts`  | Drizzle table definitions            |
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
 ├── api/                    # Feature modules
-│   └── {resource}/
-│       ├── {resource}.controller.ts
-│       ├── {resource}.service.ts
-│       ├── {resource}.repository.ts
-│       ├── {resource}.interface.ts
-│       ├── {resource}.validation.ts
-│       ├── {resource}.doc.ts
-│       └── index.ts
-├── core/                   # Repository base, Response classes, Errors
-├── config/                 # Environment, OpenAPI config
-├── db/                     # Database
-│   ├── schema/             # Drizzle ORM schemas
+│   ├── auth/               # Authentication (login, register, refresh, logout)
+│   ├── examples/           # Example CRUD module (reference for new modules)
+│   ├── health/             # Health check endpoint
+│   ├── users/              # User management
+│   └── index.ts            # Route registration
+├── common/                 # Shared validation schemas
+├── config/                 # Environment config and OpenAPI setup
+├── core/                   # Error classes, success responses, pagination
+├── db/
+│   ├── schema/             # Drizzle table definitions
 │   └── seeds/              # Database seed scripts
-├── helpers/                # Utilities (Error handling, Query builder)
-├── middlewares/            # Auth, CSRF, logging, rate limiting
-├── services/               # Shared services (Database, Redis, Logger, Events, TokenBlacklist)
-├── jobs/                   # BullMQ queues and workers
-└── __tests__/              # Test files (mirrors src structure)
+├── di/                     # Dependency injection (container, tokens)
+├── helpers/                # Utility functions (crypto, error handling, response)
+├── jobs/                   # Background jobs (queues + workers)
+├── middlewares/             # Express middlewares (auth, CSRF, rate limit, logging)
+├── services/               # Infrastructure services (database, redis, logger, events)
+├── types/                  # Global type declarations
+├── app.ts                  # Express app setup
+└── server.ts               # Server entry point
 ```
 
-## 💻 Commands
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server with hot reload |
+| `npm run build` | Build for production |
+| `npm start` | Run production build |
+| `npm test` | Run all tests |
+| `npm run test:coverage` | Run tests with coverage report |
+| `npm run lint` | Check for lint errors |
+| `npm run lint:fix` | Auto-fix lint errors |
+| `npm run prettier:fix` | Format code |
+| `npm run db:generate` | Generate Drizzle migration |
+| `npm run db:migrate` | Run migrations |
+| `npm run db:push` | Push schema to database (dev) |
+| `npm run db:studio` | Open Drizzle Studio UI |
+| `npm run seed:dev` | Seed database (dev) |
+| `npm run docker:up` | Start Docker services |
+| `npm run docker:down` | Stop Docker services |
+
+## Environment Variables
+
+Copy `.env.example` to `.env` and adjust values. Key variables:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://admin:password123@localhost:5432/backend-template` |
+| `REDIS_URL` | Redis connection string | `redis://localhost:6379` |
+| `JWT_SECRET` | JWT signing key (min 32 chars) | -- |
+| `JWT_ACCESS_EXPIRATION_MINUTES` | Access token TTL | `30` |
+| `JWT_REFRESH_EXPIRATION_DAYS` | Refresh token TTL | `30` |
+| `NODE_ENV` | Environment | `development` |
+| `PORT` | Server port | `3000` |
+| `LOG_LEVEL` | Pino log level | `debug` |
+| `CACHE_ENABLED` | Enable Redis caching | `true` |
+| `JOBS_ENABLED` | Enable BullMQ workers | `true` |
+| `ALLOWED_ORIGINS` | CORS allowed origins (comma-separated) | -- |
+| `BULL_BOARD_USERNAME` | Bull Board UI username | `admin` |
+| `BULL_BOARD_PASSWORD` | Bull Board UI password | `admin` |
+
+## Architecture
+
+```
+Request → Routes → Middleware → Controller → Service → Repository → PostgreSQL
+```
+
+| Layer | Responsibility | Depends On |
+|-------|---------------|------------|
+| Routes | HTTP routing, request validation (Zod) | Controller |
+| Controller | Parse request, format response | Service |
+| Service | Business logic, orchestration | Repository |
+| Repository | Data access via Drizzle ORM | Database |
+
+Each feature module in `src/api/` follows this pattern. The `examples` module is a complete reference implementation.
+
+## Creating a Module
+
+Follow the `src/api/examples/` module as a reference. Each module needs:
+
+| File | Purpose |
+|------|---------|
+| `src/db/schema/<name>s.ts` | Drizzle table definition |
+| `src/api/<name>/<name>.interface.ts` | TypeScript types |
+| `src/api/<name>/<name>.validation.ts` | Zod request schemas |
+| `src/api/<name>/<name>.repository.ts` | Database queries |
+| `src/api/<name>/<name>.service.ts` | Business logic |
+| `src/api/<name>/<name>.controller.ts` | Request handlers |
+| `src/api/<name>/<name>.doc.ts` | OpenAPI documentation |
+| `src/api/<name>/index.ts` | Route definitions |
+
+Registration steps:
+
+1. Export schema from `src/db/schema/index.ts`
+2. Add DI tokens to `src/di/tokens.ts`
+3. Register bindings in `src/di/container.ts`
+4. Register routes in `src/api/index.ts`
+
+## Testing
 
 ```bash
-# Docker
-docker compose up -d              # Start all services
-docker compose logs -f backend    # View backend logs
-docker compose down               # Stop all services
+# Run all tests
+npm test
 
-# Development
-npm run dev                       # Start dev server
-npm run build                     # Build for production
-npm run lint                      # Check linting
-npm run lint:fix                  # Fix lint issues
-npm run prettier:fix              # Format code
-npm test                          # Run tests
-npm run test:coverage             # Tests with coverage
-npm run seed:dev                  # Seed database
-npm run generate                  # Generate new API module (Plop)
+# Run with coverage
+npm run test:coverage
 
-# Database
-npm run db:generate               # Generate migration files
-npm run db:migrate                # Run migrations
-npm run db:push                   # Push schema to database (dev)
-npm run db:studio                 # Open Drizzle Studio
+# Run specific test file
+npx jest src/__tests__/api/users/user.e2e.test.ts --verbose
 ```
 
-## 🔑 Environment Variables
+Test files live in `src/__tests__/`, mirroring the source structure. E2E tests (`.e2e.test.ts`) hit the actual API with a test database. Unit tests (`.test.ts`) test isolated logic.
 
-| Variable                        | Description                           | Required |
-| ------------------------------- | ------------------------------------- | -------- |
-| `DATABASE_URL`                  | PostgreSQL connection string          | Yes      |
-| `POSTGRES_USER`                 | PostgreSQL username (for Docker)      | Yes      |
-| `POSTGRES_PASSWORD`             | PostgreSQL password (for Docker)      | Yes      |
-| `POSTGRES_DB`                   | PostgreSQL database name (for Docker) | Yes      |
-| `JWT_SECRET`                    | Secret for JWT signing                | Yes      |
-| `JWT_ACCESS_EXPIRATION_MINUTES` | Access token expiry (default: 30)     | No       |
-| `JWT_REFRESH_EXPIRATION_DAYS`   | Refresh token expiry (default: 30)    | No       |
-| `REDIS_URL`                     | Redis connection string               | No       |
-| `CACHE_ENABLED`                 | Enable Redis-backed caching features  | No       |
-| `JOBS_ENABLED`                  | Enable BullMQ workers and Bull Board  | No       |
-| `PORT`                          | Server port (default: 3000)           | No       |
-| `LOG_LEVEL`                     | Pino log level (default: info)        | No       |
-| `OTEL_ENABLED`                  | Enable OpenTelemetry (default: false) | No       |
-| `OTEL_EXPORTER_ENDPOINT`        | OTLP exporter URL                     | No       |
+## Docker
 
-## ✨ Features
-
-- 🔒 **Security:** Helmet, CSRF (double submit cookie), rate limiting, CORS, Argon2 password hashing, JWT token revocation
-- ✅ **Validation:** Zod schemas with auto-generated OpenAPI docs
-- 🗄️ **Database:** Drizzle ORM with type-safe queries, pagination, soft delete, Redis caching
-- 🚨 **Errors:** RFC 9457 Problem Details (`application/problem+json`)
-- 📝 **Logging:** Pino (JSON stdout, 12-Factor compliant)
-- ⚙️ **Jobs:** BullMQ background queues with Bull Board monitoring UI
-- 📊 **Observability:** OpenTelemetry auto-instrumentation (opt-in)
-- 🧪 **Testing:** Jest + Supertest
-- 🛠️ **DX:** tsx hot reload, Plop module scaffolding, lint-staged, path aliases (`@/`)
-
-## 🧩 Core vs Optional Modules
-
-### Core by default
-
-- Express 5 + TypeScript app structure
-- PostgreSQL + Drizzle ORM persistence
-- Zod validation + OpenAPI generation
-- Auth, error handling, logging, and HTTP middleware
-
-### Optional modules
-
-- Redis-backed caching and token revocation helpers
-- BullMQ workers + Bull Board UI
-- OpenTelemetry instrumentation
-
-The project keeps these optional modules available, but they can be disabled explicitly in env config when you want a lighter starting point:
+Docker Compose provides PostgreSQL and Redis for local development:
 
 ```bash
-CACHE_ENABLED=false   # Skip Redis connection and Redis-backed caching behavior
-JOBS_ENABLED=false    # Skip BullMQ initialization and unmount /admin/queues
-# OTEL_ENABLED=false  # Default already off unless enabled explicitly
+# Start services
+npm run docker:up
+
+# Stop services
+npm run docker:down
+
+# View running services
+docker compose ps
 ```
 
-## 📚 Documentation
+Services:
 
-| Document                                     | Description                    |
-| -------------------------------------------- | ------------------------------ |
-| [CONTRIBUTING.md](CONTRIBUTING.md)           | Git flow, code standards       |
-| [docs/SETUP.md](docs/SETUP.md)               | Detailed development setup     |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Design decisions               |
-| [docs/adr/](docs/adr/)                       | Architectural Decision Records |
+| Service | Port | Purpose |
+|---------|------|---------|
+| postgres | 5432 | PostgreSQL 16 database |
+| redis | 6379 | Redis 7 cache and job queue |
+| backend | 3000 | Application (production build) |
 
-## 📄 License
+## Contributing
 
-ISC © Loc Nguyen
+See [CONTRIBUTING.md](CONTRIBUTING.md) for git workflow, commit conventions, and code standards.
+
+## License
+
+[ISC](LICENSE)
