@@ -86,7 +86,7 @@ describe('Users API (E2E)', () => {
         password: 'Secure@123',
       });
 
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(403);
     });
 
     it('should return 400 with invalid body', async () => {

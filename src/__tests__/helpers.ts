@@ -3,12 +3,8 @@ import request from 'supertest';
 
 import { IUser } from '@/api/users/user.interface';
 import app from '@/app';
-import { users } from '@/db/schema';
-import { container, TOKENS } from '@/di';
+import { examples, users } from '@/db/schema';
 import { connectDB, db, disconnectDB } from '@/services/database.service';
-import RedisService from '@/services/redis.service';
-
-const redisService = container.get<RedisService>(TOKENS.RedisService);
 
 export const TEST_ADMIN = {
   fullName: 'Admin User',
@@ -26,15 +22,14 @@ export const TEST_USER = {
 
 export async function connectTestDB(): Promise<void> {
   await connectDB();
-  await redisService.connect();
 }
 
 export async function disconnectTestDB(): Promise<void> {
-  await redisService.disconnect();
   await disconnectDB();
 }
 
 export async function clearDatabase(): Promise<void> {
+  await db.delete(examples);
   await db.delete(users);
 }
 

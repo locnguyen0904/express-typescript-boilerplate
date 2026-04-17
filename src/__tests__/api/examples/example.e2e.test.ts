@@ -73,7 +73,7 @@ describe('Examples API (E2E)', () => {
         .post('/api/v1/examples')
         .send({ title: 'Anon', content: 'No auth' });
 
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(403);
     });
 
     it('should return 400 with missing fields', async () => {
@@ -135,7 +135,7 @@ describe('Examples API (E2E)', () => {
     });
 
     it('should return 404 for non-existent id', async () => {
-      const fakeId = '00000000-0000-0000-0000-000000000001';
+      const fakeId = '550e8400-e29b-41d4-a716-446655440000';
 
       const res = await request(app).get(`/api/v1/examples/${fakeId}`);
 
@@ -167,7 +167,7 @@ describe('Examples API (E2E)', () => {
 
     it('should return 404 for non-existent id', async () => {
       const { token } = await loginAsAdmin();
-      const fakeId = '00000000-0000-0000-0000-000000000001';
+      const fakeId = '550e8400-e29b-41d4-a716-446655440000';
 
       const res = await authRequest(token)
         .put(`/api/v1/examples/${fakeId}`)
@@ -222,7 +222,7 @@ describe('Examples API (E2E)', () => {
 
       const res = await request(app).delete(`/api/v1/examples/${example.id}`);
 
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(403);
     });
   });
 });

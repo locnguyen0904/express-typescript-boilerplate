@@ -1,6 +1,8 @@
 import request from 'supertest';
 
 import app from '@/app';
+import { container, TOKENS } from '@/di';
+import RedisService from '@/services/redis.service';
 
 import {
   clearDatabase,
@@ -12,14 +14,18 @@ import {
   TEST_ADMIN,
 } from '../../helpers';
 
+const redisService = container.get<RedisService>(TOKENS.RedisService);
+
 describe('Auth API (E2E)', () => {
   let csrf: { csrfToken: string; cookieHeader: string };
 
   beforeAll(async () => {
     await connectTestDB();
+    await redisService.connect();
   });
 
   afterAll(async () => {
+    await redisService.disconnect();
     await disconnectTestDB();
   });
 
