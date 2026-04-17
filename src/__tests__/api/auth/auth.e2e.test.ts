@@ -32,9 +32,19 @@ describe('Auth API (E2E)', () => {
   // ──────────────── LOGIN ────────────────
 
   describe('POST /api/v1/auth/login', () => {
+    it('should reject login without CSRF token', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email: TEST_ADMIN.email, password: TEST_ADMIN.password });
+
+      expect(res.status).toBe(403);
+    });
+
     it('should login with valid credentials', async () => {
       const res = await request(app)
         .post('/api/v1/auth/login')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader)
         .send({ email: TEST_ADMIN.email, password: TEST_ADMIN.password });
 
       expect(res.status).toBe(200);
@@ -49,6 +59,8 @@ describe('Auth API (E2E)', () => {
     it('should return 401 with wrong password', async () => {
       const res = await request(app)
         .post('/api/v1/auth/login')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader)
         .send({ email: TEST_ADMIN.email, password: 'wrong-password' });
 
       expect(res.status).toBe(401);
@@ -57,6 +69,8 @@ describe('Auth API (E2E)', () => {
     it('should return 401 with non-existent email', async () => {
       const res = await request(app)
         .post('/api/v1/auth/login')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader)
         .send({ email: 'nobody@test.com', password: 'password123' });
 
       expect(res.status).toBe(401);
@@ -65,6 +79,8 @@ describe('Auth API (E2E)', () => {
     it('should return 400 with missing fields', async () => {
       const res = await request(app)
         .post('/api/v1/auth/login')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader)
         .send({ email: TEST_ADMIN.email });
 
       expect(res.status).toBe(400);
@@ -86,7 +102,10 @@ describe('Auth API (E2E)', () => {
     });
 
     it('should succeed even without auth header', async () => {
-      const res = await request(app).post('/api/v1/auth/logout');
+      const res = await request(app)
+        .post('/api/v1/auth/logout')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader);
 
       expect(res.status).toBe(200);
     });
@@ -99,6 +118,8 @@ describe('Auth API (E2E)', () => {
       // Login first to obtain encrypted refreshToken cookie
       const loginRes = await request(app)
         .post('/api/v1/auth/login')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader)
         .send({ email: TEST_ADMIN.email, password: TEST_ADMIN.password });
 
       expect(loginRes.status).toBe(200);
@@ -109,13 +130,15 @@ describe('Auth API (E2E)', () => {
         | undefined;
       expect(setCookieHeader).toBeDefined();
 
-      // Forward the cookies from login to the refresh endpoint
-      const cookies = Array.isArray(setCookieHeader)
+      // Forward refresh + csrf cookies to the refresh endpoint
+      const refreshCookies = Array.isArray(setCookieHeader)
         ? setCookieHeader.join('; ')
         : String(setCookieHeader);
+      const cookies = `${csrf.cookieHeader}; ${refreshCookies}`;
 
       const res = await request(app)
         .post('/api/v1/auth/refresh-token')
+        .set('x-csrf-token', csrf.csrfToken)
         .set('Cookie', cookies);
 
       expect(res.status).toBe(200);
@@ -127,7 +150,10 @@ describe('Auth API (E2E)', () => {
     });
 
     it('should return 401 when no refresh cookie is provided', async () => {
-      const res = await request(app).post('/api/v1/auth/refresh-token');
+      const res = await request(app)
+        .post('/api/v1/auth/refresh-token')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader);
 
       expect(res.status).toBe(401);
     });
@@ -135,7 +161,11 @@ describe('Auth API (E2E)', () => {
     it('should return 401 when refresh cookie contains an invalid token', async () => {
       const res = await request(app)
         .post('/api/v1/auth/refresh-token')
-        .set('Cookie', 'refreshToken=invalid-garbage-token');
+        .set('x-csrf-token', csrf.csrfToken)
+        .set(
+          'Cookie',
+          `${csrf.cookieHeader}; refreshToken=invalid-garbage-token`
+        );
 
       expect(res.status).toBe(401);
     });

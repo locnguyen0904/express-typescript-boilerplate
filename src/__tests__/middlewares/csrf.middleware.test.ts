@@ -44,11 +44,11 @@ describe('CSRF Middleware', () => {
       expect(skipCsrfProtection(mockReq)).toBe(true);
     });
 
-    it('should skip CSRF if no CSRF token header is present', () => {
+    it('should NOT skip CSRF when no CSRF token header is present', () => {
       const mockReq: MinimalRequest = {
         headers: {},
       };
-      expect(skipCsrfProtection(mockReq)).toBe(true);
+      expect(skipCsrfProtection(mockReq)).toBe(false);
     });
 
     it('should NOT skip CSRF if CSRF token header is present and NOT a Bearer auth', () => {
