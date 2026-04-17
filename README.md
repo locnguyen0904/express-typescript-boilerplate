@@ -28,7 +28,7 @@ git clone <repo-url> my-project
 cd my-project
 cp .env.example .env
 
-# Start PostgreSQL and Redis
+# Start PostgreSQL and Redis only
 npm run docker:up
 
 # Install dependencies
@@ -38,7 +38,7 @@ npm install
 npm run db:push
 npm run seed:dev
 
-# Start dev server
+# Start the API locally
 npm run dev
 ```
 
@@ -183,7 +183,8 @@ Services:
 |---------|------|---------|
 | postgres | 5432 | PostgreSQL 16 database |
 | redis | 6379 | Redis 7 cache and job queue |
-| backend | 3000 | Application (production build) |
+
+The development Compose file starts infrastructure only. Run the API itself with `npm run dev`.
 
 ## Contributing
 
