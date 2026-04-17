@@ -30,8 +30,8 @@ export default class ExampleService {
   }
 
   async findAll(
-    page?: number,
-    pageSize?: number
+    page: number = 1,
+    pageSize: number = 25
   ): Promise<PaginatedResult<IExample>> {
     if (!this.redis.isConnected) {
       return this.exampleRepository.findAll(page, pageSize);

@@ -36,6 +36,9 @@ export const errorHandle = (
       detail: error.message,
       instance,
       code: typeof error.code === 'string' ? error.code : undefined,
+      ...(Array.isArray(error.code)
+        ? { errors: error.code as { message: string; code: string }[] }
+        : {}),
       ...(includeStack && error.stack ? { stack: error.stack } : {}),
     });
     return;
@@ -62,6 +65,18 @@ export const errorHandle = (
       detail: 'Invalid input format',
       instance,
       code: 'INVALID_INPUT',
+    });
+    return;
+  }
+
+  if (isCsrfError(error)) {
+    sendProblem(res, {
+      type: 'about:blank',
+      title: 'Forbidden',
+      status: 403,
+      detail: 'Invalid CSRF token',
+      instance,
+      code: 'EBADCSRFTOKEN',
     });
     return;
   }
@@ -114,6 +129,12 @@ const isInvalidInputError = (error: unknown): error is { code: string } => {
   if (!error || typeof error !== 'object') return false;
   const err = error as { code?: string };
   return 'code' in err && err.code === '22P02';
+};
+
+const isCsrfError = (error: unknown): error is { code: string } => {
+  if (!error || typeof error !== 'object') return false;
+  const err = error as { code?: string };
+  return 'code' in err && err.code === 'EBADCSRFTOKEN';
 };
 
 export const logErrors = (
