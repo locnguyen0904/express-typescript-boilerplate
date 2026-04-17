@@ -82,7 +82,11 @@ app.get('/', (_req: Request, res: Response) => {
 app.get('/health', healthHandler);
 
 // Bull Board - Queue monitoring UI (basic auth)
-if (config.features.jobsEnabled) {
+if (
+  config.features.jobsEnabled &&
+  config.bullBoard.username &&
+  config.bullBoard.password
+) {
   const bullBoardAdapter = new ExpressAdapter();
   bullBoardAdapter.setBasePath('/admin/queues');
   createBullBoard({
@@ -98,8 +102,8 @@ if (config.features.jobsEnabled) {
           .toString()
           .split(':');
         if (
-          username === env.BULL_BOARD_USERNAME &&
-          password === env.BULL_BOARD_PASSWORD
+          username === config.bullBoard.username &&
+          password === config.bullBoard.password
         ) {
           return next();
         }

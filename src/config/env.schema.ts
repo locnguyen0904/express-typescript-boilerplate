@@ -39,8 +39,8 @@ const envSchema = z.object({
   OTEL_ENABLED: z.string().optional(),
   OTEL_EXPORTER_ENDPOINT: z.string().optional(),
   OTEL_SERVICE_NAME: z.string().optional(),
-  BULL_BOARD_USERNAME: z.string().default('admin'),
-  BULL_BOARD_PASSWORD: z.string().default('admin'),
+  BULL_BOARD_USERNAME: z.string().min(1).optional(),
+  BULL_BOARD_PASSWORD: z.string().min(1).optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

@@ -50,4 +50,14 @@ describe('Feature flag config', () => {
     expect(config.redis.enabled).toBe(true);
     expect(config.features.jobsEnabled).toBe(true);
   });
+
+  it('does not provide default Bull Board credentials when omitted', () => {
+    delete process.env.BULL_BOARD_USERNAME;
+    delete process.env.BULL_BOARD_PASSWORD;
+
+    const config = loadConfig();
+
+    expect(config.bullBoard.username).toBeUndefined();
+    expect(config.bullBoard.password).toBeUndefined();
+  });
 });

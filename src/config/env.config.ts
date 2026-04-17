@@ -39,6 +39,10 @@ interface IConfig {
   firebase: IFirebaseConfig;
   redis: IRedisConfig;
   features: IFeatureConfig;
+  bullBoard: {
+    username?: string;
+    password?: string;
+  };
   env: string;
   port?: number;
   logLevel: string;
@@ -70,6 +74,10 @@ const config: IConfig = {
   },
   features: {
     jobsEnabled: env.JOBS_ENABLED,
+  },
+  bullBoard: {
+    username: env.BULL_BOARD_USERNAME,
+    password: env.BULL_BOARD_PASSWORD,
   },
   env: env.NODE_ENV,
   port: env.PORT,

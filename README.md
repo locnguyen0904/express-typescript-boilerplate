@@ -107,8 +107,8 @@ Copy `.env.example` to `.env` and adjust values. Key variables:
 | `CACHE_ENABLED` | Enable Redis caching | `true` |
 | `JOBS_ENABLED` | Enable BullMQ workers | `true` |
 | `ALLOWED_ORIGINS` | CORS allowed origins (comma-separated) | -- |
-| `BULL_BOARD_USERNAME` | Bull Board UI username | `admin` |
-| `BULL_BOARD_PASSWORD` | Bull Board UI password | `admin` |
+| `BULL_BOARD_USERNAME` | Bull Board UI username; mount `/admin/queues` only when set with password | -- |
+| `BULL_BOARD_PASSWORD` | Bull Board UI password; mount `/admin/queues` only when set with username | -- |
 
 ## Architecture
 
