@@ -207,33 +207,27 @@ describe('Auth API (E2E)', () => {
     });
 
     it('should revoke the refresh token on logout', async () => {
-      const loginRes = await request(app)
+      const agent = request.agent(app);
+      const csrfRes = await agent.get('/api/v1/csrf-token');
+      const csrfToken = csrfRes.body.csrfToken as string;
+
+      const loginRes = await agent
         .post('/api/v1/auth/login')
-        .set('x-csrf-token', csrf.csrfToken)
-        .set('Cookie', csrf.cookieHeader)
+        .set('x-csrf-token', csrfToken)
         .send({ email: TEST_ADMIN.email, password: TEST_ADMIN.password });
 
       const accessToken = loginRes.body.data.token as string;
-      const refreshCookie = loginRes.headers['set-cookie'];
-      expect(refreshCookie).toBeDefined();
 
-      const cookieHeader = Array.isArray(refreshCookie)
-        ? refreshCookie.join('; ')
-        : String(refreshCookie);
-      const refreshWithCsrfCookie = `${csrf.cookieHeader}; ${cookieHeader}`;
-
-      const logoutRes = await request(app)
+      const logoutRes = await agent
         .post('/api/v1/auth/logout')
         .set('Authorization', `Bearer ${accessToken}`)
-        .set('x-csrf-token', csrf.csrfToken)
-        .set('Cookie', cookieHeader);
+        .set('x-csrf-token', csrfToken);
 
       expect(logoutRes.status).toBe(200);
 
-      const refreshAfterLogout = await request(app)
+      const refreshAfterLogout = await agent
         .post('/api/v1/auth/refresh-token')
-        .set('x-csrf-token', csrf.csrfToken)
-        .set('Cookie', refreshWithCsrfCookie);
+        .set('x-csrf-token', csrfToken);
 
       expect(refreshAfterLogout.status).toBe(401);
     });

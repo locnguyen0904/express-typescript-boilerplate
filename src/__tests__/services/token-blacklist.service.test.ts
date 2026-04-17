@@ -9,6 +9,7 @@ describe('TokenBlacklistService', () => {
     mockRedis = {
       get: jest.fn(),
       set: jest.fn(),
+      setIfAbsent: jest.fn(),
     } as unknown as jest.Mocked<RedisService>;
 
     // Define isConnected as a property we can change
@@ -69,6 +70,31 @@ describe('TokenBlacklistService', () => {
       const result = await service.isRevoked('some-jti');
       expect(result).toBe(false);
       expect(mockRedis.get).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('revokeIfFirstUse', () => {
+    it('should reserve token on first use', async () => {
+      const jti = 'jti-first';
+      const ttl = 3600;
+      mockRedis.setIfAbsent.mockResolvedValue(true);
+
+      const result = await service.revokeIfFirstUse(jti, ttl);
+
+      expect(mockRedis.setIfAbsent).toHaveBeenCalledWith(
+        `token:blacklist:${jti}`,
+        1,
+        ttl
+      );
+      expect(result).toBe(true);
+    });
+
+    it('should return false if token is already reserved', async () => {
+      mockRedis.setIfAbsent.mockResolvedValue(false);
+
+      const result = await service.revokeIfFirstUse('jti-existing', 3600);
+
+      expect(result).toBe(false);
     });
   });
 });

@@ -58,13 +58,14 @@ export default class AuthService {
         throw new UnAuthorizedError('Invalid refresh token');
       }
 
-      if (await this.tokenBlacklist.isRevoked(payload.jti)) {
+      const ttl = payload.exp - Math.floor(Date.now() / 1000);
+      const reserved = await this.tokenBlacklist.revokeIfFirstUse(
+        payload.jti,
+        ttl
+      );
+      if (!reserved) {
         throw new UnAuthorizedError('Refresh token has been revoked');
       }
-
-      // Revoke the old refresh token
-      const ttl = payload.exp - Math.floor(Date.now() / 1000);
-      await this.tokenBlacklist.revoke(payload.jti, ttl);
 
       const user = await this.userService.findById(payload.sub);
       if (!user) {

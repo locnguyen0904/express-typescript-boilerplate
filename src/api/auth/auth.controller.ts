@@ -21,7 +21,7 @@ export default class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      path: '/api/v1/auth/refresh-token',
+      path: '/api/v1/auth',
       expires: tokens.refresh.expires,
     });
 
@@ -51,7 +51,7 @@ export default class AuthController {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        path: '/api/v1/auth/refresh-token',
+        path: '/api/v1/auth',
         expires: tokens.refresh.expires,
       });
 
@@ -60,7 +60,7 @@ export default class AuthController {
         data: { token: tokens.access.token },
       }).send(res);
     } catch (error) {
-      res.clearCookie('refreshToken', { path: '/api/v1/auth/refresh-token' });
+      res.clearCookie('refreshToken', { path: '/api/v1/auth' });
       throw error;
     }
   }
@@ -84,7 +84,7 @@ export default class AuthController {
       }
     }
 
-    res.clearCookie('refreshToken', { path: '/api/v1/auth/refresh-token' });
+    res.clearCookie('refreshToken', { path: '/api/v1/auth' });
     new SuccessResponse({ message: 'Logout successfully' }).send(res);
   }
 }

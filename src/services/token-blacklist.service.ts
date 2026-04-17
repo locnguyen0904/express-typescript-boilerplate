@@ -17,6 +17,11 @@ export default class TokenBlacklistService {
     await this.redis.set(`${PREFIX}${jti}`, 1, ttlSeconds);
   }
 
+  async revokeIfFirstUse(jti: string, ttlSeconds: number): Promise<boolean> {
+    if (!this.redis.isConnected || ttlSeconds <= 0) return false;
+    return this.redis.setIfAbsent(`${PREFIX}${jti}`, 1, ttlSeconds);
+  }
+
   async isRevoked(jti: string): Promise<boolean> {
     if (!this.redis.isConnected) return false;
     const result = await this.redis.get<number>(`${PREFIX}${jti}`);

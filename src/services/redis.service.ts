@@ -91,6 +91,24 @@ export default class RedisService {
     }
   }
 
+  async setIfAbsent(key: string, value: unknown, ttl = 300): Promise<boolean> {
+    if (!this.isConnected) return false;
+
+    try {
+      const result = await this.client!.set(
+        key,
+        JSON.stringify(value),
+        'EX',
+        ttl,
+        'NX'
+      );
+      return result === 'OK';
+    } catch (error) {
+      logger.error({ key, error }, 'Redis setIfAbsent failed');
+      return false;
+    }
+  }
+
   async del(...keys: string[]): Promise<boolean> {
     if (!this.isConnected || keys.length === 0) return false;
 
