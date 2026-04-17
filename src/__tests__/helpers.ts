@@ -1,9 +1,14 @@
+import argon2 from 'argon2';
 import request from 'supertest';
 
 import { IUser } from '@/api/users/user.interface';
 import app from '@/app';
 import { users } from '@/db/schema';
+import { container, TOKENS } from '@/di';
 import { connectDB, db, disconnectDB } from '@/services/database.service';
+import RedisService from '@/services/redis.service';
+
+const redisService = container.get<RedisService>(TOKENS.RedisService);
 
 export const TEST_ADMIN = {
   fullName: 'Admin User',
@@ -21,9 +26,11 @@ export const TEST_USER = {
 
 export async function connectTestDB(): Promise<void> {
   await connectDB();
+  await redisService.connect();
 }
 
 export async function disconnectTestDB(): Promise<void> {
+  await redisService.disconnect();
   await disconnectDB();
 }
 
@@ -32,12 +39,19 @@ export async function clearDatabase(): Promise<void> {
 }
 
 export async function seedAdmin(): Promise<IUser> {
+  const hashedPassword = await argon2.hash(TEST_ADMIN.password, {
+    type: argon2.argon2id,
+    memoryCost: 19456,
+    timeCost: 2,
+    parallelism: 1,
+  });
+
   const result = await db
     .insert(users)
     .values({
       fullName: TEST_ADMIN.fullName,
       email: TEST_ADMIN.email,
-      password: TEST_ADMIN.password,
+      password: hashedPassword,
       role: TEST_ADMIN.role,
     })
     .returning();
@@ -45,12 +59,19 @@ export async function seedAdmin(): Promise<IUser> {
 }
 
 export async function seedUser(): Promise<IUser> {
+  const hashedPassword = await argon2.hash(TEST_USER.password, {
+    type: argon2.argon2id,
+    memoryCost: 19456,
+    timeCost: 2,
+    parallelism: 1,
+  });
+
   const result = await db
     .insert(users)
     .values({
       fullName: TEST_USER.fullName,
       email: TEST_USER.email,
-      password: TEST_USER.password,
+      password: hashedPassword,
       role: TEST_USER.role,
     })
     .returning();
@@ -64,12 +85,33 @@ interface LoginResponse {
   };
 }
 
+export async function getCsrfSession(): Promise<{
+  csrfToken: string;
+  cookieHeader: string;
+}> {
+  const res = await request(app).get('/api/v1/csrf-token').expect(200);
+
+  const cookies = res.headers['set-cookie'];
+  if (!cookies) {
+    throw new Error('CSRF cookie was not set');
+  }
+
+  return {
+    csrfToken: res.body.csrfToken as string,
+    cookieHeader: Array.isArray(cookies) ? cookies.join('; ') : String(cookies),
+  };
+}
+
 export async function loginAs(
   email: string,
   password: string
 ): Promise<{ token: string; user: IUser }> {
+  const csrf = await getCsrfSession();
+
   const res = await request(app)
     .post('/api/v1/auth/login')
+    .set('x-csrf-token', csrf.csrfToken)
+    .set('Cookie', csrf.cookieHeader)
     .send({ email, password })
     .expect(200);
 

@@ -6,12 +6,15 @@ import {
   clearDatabase,
   connectTestDB,
   disconnectTestDB,
+  getCsrfSession,
   loginAsAdmin,
   seedAdmin,
   TEST_ADMIN,
 } from '../../helpers';
 
 describe('Auth API (E2E)', () => {
+  let csrf: { csrfToken: string; cookieHeader: string };
+
   beforeAll(async () => {
     await connectTestDB();
   });
@@ -23,6 +26,7 @@ describe('Auth API (E2E)', () => {
   beforeEach(async () => {
     await clearDatabase();
     await seedAdmin();
+    csrf = await getCsrfSession();
   });
 
   // ──────────────── LOGIN ────────────────
@@ -134,6 +138,68 @@ describe('Auth API (E2E)', () => {
         .set('Cookie', 'refreshToken=invalid-garbage-token');
 
       expect(res.status).toBe(401);
+    });
+
+    it('should reject reuse of the same refresh token cookie', async () => {
+      const loginRes = await request(app)
+        .post('/api/v1/auth/login')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader)
+        .send({ email: TEST_ADMIN.email, password: TEST_ADMIN.password });
+
+      const originalCookie = loginRes.headers['set-cookie'];
+      expect(originalCookie).toBeDefined();
+
+      const cookieHeader = Array.isArray(originalCookie)
+        ? originalCookie.join('; ')
+        : String(originalCookie);
+      const refreshWithCsrfCookie = `${csrf.cookieHeader}; ${cookieHeader}`;
+
+      const firstRefresh = await request(app)
+        .post('/api/v1/auth/refresh-token')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', refreshWithCsrfCookie);
+
+      expect(firstRefresh.status).toBe(200);
+
+      const replayRefresh = await request(app)
+        .post('/api/v1/auth/refresh-token')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', refreshWithCsrfCookie);
+
+      expect(replayRefresh.status).toBe(401);
+    });
+
+    it('should revoke the refresh token on logout', async () => {
+      const loginRes = await request(app)
+        .post('/api/v1/auth/login')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader)
+        .send({ email: TEST_ADMIN.email, password: TEST_ADMIN.password });
+
+      const accessToken = loginRes.body.data.token as string;
+      const refreshCookie = loginRes.headers['set-cookie'];
+      expect(refreshCookie).toBeDefined();
+
+      const cookieHeader = Array.isArray(refreshCookie)
+        ? refreshCookie.join('; ')
+        : String(refreshCookie);
+      const refreshWithCsrfCookie = `${csrf.cookieHeader}; ${cookieHeader}`;
+
+      const logoutRes = await request(app)
+        .post('/api/v1/auth/logout')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', cookieHeader);
+
+      expect(logoutRes.status).toBe(200);
+
+      const refreshAfterLogout = await request(app)
+        .post('/api/v1/auth/refresh-token')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', refreshWithCsrfCookie);
+
+      expect(refreshAfterLogout.status).toBe(401);
     });
   });
 });

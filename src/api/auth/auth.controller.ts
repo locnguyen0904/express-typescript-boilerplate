@@ -72,6 +72,18 @@ export default class AuthController {
       await this.authService.revokeAccessToken(authHeader.split(' ')[1]);
     }
 
+    const encryptedRefreshToken = req.cookies.refreshToken as
+      | string
+      | undefined;
+    if (encryptedRefreshToken) {
+      try {
+        const refreshToken = decrypt(encryptedRefreshToken);
+        await this.authService.revokeToken(refreshToken, 'refresh');
+      } catch {
+        // Ignore malformed cookie during logout, still clear it below
+      }
+    }
+
     res.clearCookie('refreshToken', { path: '/api/v1/auth/refresh-token' });
     new SuccessResponse({ message: 'Logout successfully' }).send(res);
   }

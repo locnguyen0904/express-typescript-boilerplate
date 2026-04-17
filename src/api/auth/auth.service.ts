@@ -54,11 +54,17 @@ export default class AuthService {
         throw new UnAuthorizedError('Invalid token type');
       }
 
-      // Revoke the old refresh token
-      if (payload.jti && payload.exp) {
-        const ttl = payload.exp - Math.floor(Date.now() / 1000);
-        await this.tokenBlacklist.revoke(payload.jti, ttl);
+      if (!payload.jti || !payload.exp) {
+        throw new UnAuthorizedError('Invalid refresh token');
       }
+
+      if (await this.tokenBlacklist.isRevoked(payload.jti)) {
+        throw new UnAuthorizedError('Refresh token has been revoked');
+      }
+
+      // Revoke the old refresh token
+      const ttl = payload.exp - Math.floor(Date.now() / 1000);
+      await this.tokenBlacklist.revoke(payload.jti, ttl);
 
       const user = await this.userService.findById(payload.sub);
       if (!user) {
@@ -101,18 +107,31 @@ export default class AuthService {
     };
   }
 
-  async revokeAccessToken(token: string): Promise<void> {
+  async revokeToken(
+    token: string,
+    expectedType?: 'access' | 'refresh'
+  ): Promise<void> {
     try {
       const payload = jwt.verify(token, config.jwt.secret) as {
+        type?: string;
         jti?: string;
         exp?: number;
       };
+
+      if (expectedType && payload.type !== expectedType) {
+        return;
+      }
+
       if (payload.jti && payload.exp) {
         const ttl = payload.exp - Math.floor(Date.now() / 1000);
         await this.tokenBlacklist.revoke(payload.jti, ttl);
       }
     } catch {
-      // Token might be expired — skip revocation
+      // Ignore invalid or expired token during logout/revocation flow
     }
+  }
+
+  async revokeAccessToken(token: string): Promise<void> {
+    await this.revokeToken(token, 'access');
   }
 }
