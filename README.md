@@ -1,6 +1,25 @@
-# Backend Template
+<h1 align="center">Backend Template 🚀</h1>
 
-Production-ready Express.js + TypeScript + PostgreSQL backend template with best practices.
+<p align="center">
+  A battle-tested, production-ready Express.js & TypeScript boilerplate with PostgreSQL, Drizzle ORM, and BullMQ.
+</p>
+
+<p align="center">
+  <a href="https://nodejs.org"><img src="https://img.shields.io/badge/Node.js-24.x-green.svg" alt="Node.js"></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.x-blue.svg" alt="TypeScript"></a>
+  <a href="https://opensource.org/licenses/ISC"><img src="https://img.shields.io/badge/License-ISC-blue.svg" alt="License"></a>
+  <a href="https://expressjs.com/"><img src="https://img.shields.io/badge/Express-5.x-lightgrey.svg" alt="Express"></a>
+</p>
+
+## 📋 Table of Contents
+- [✨ Features](#-features)
+- [🏗️ Architecture](#️-architecture)
+- [🚀 Quick Start](#-quick-start)
+- [📁 Project Structure](#-project-structure)
+- [🛠️ Available Commands](#️-available-commands)
+- [📖 Environment Variables](#-environment-variables)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
 
 ## Tech Stack
 
