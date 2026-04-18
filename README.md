@@ -122,7 +122,7 @@ Make sure to adjust the values in your `.env` file:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://admin:password123@localhost:5432/backend-template` |
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://admin:password123@localhost:5432/express-typescript-boilerplate` |
 | `REDIS_URL` | Redis connection string | `redis://localhost:6379` |
 | `JWT_SECRET` | JWT signing key (min 32 chars) | -- |
 | `PORT` | API Server port | `3000` |

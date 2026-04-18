@@ -76,7 +76,7 @@ app.get('/api/v1/csrf-token', (req: Request, res: Response) => {
 });
 
 app.get('/', (_req: Request, res: Response) => {
-  res.json({ message: 'Welcome to backend-template API!' });
+  res.json({ message: 'Welcome to express-typescript-boilerplate API!' });
 });
 
 app.get('/health', healthHandler);

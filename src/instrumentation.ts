@@ -9,7 +9,8 @@ const isEnabled = process.env.OTEL_ENABLED === 'true';
 
 if (isEnabled) {
   const endpoint = process.env.OTEL_EXPORTER_ENDPOINT;
-  const serviceName = process.env.OTEL_SERVICE_NAME || 'backend-template';
+  const serviceName =
+    process.env.OTEL_SERVICE_NAME || 'express-typescript-boilerplate';
 
   if (process.env.OTEL_LOG_LEVEL) {
     diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);

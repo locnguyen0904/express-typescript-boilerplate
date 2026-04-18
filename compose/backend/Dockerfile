@@ -5,9 +5,9 @@ RUN apk upgrade --no-cache && apk add --no-cache dumb-init
 RUN addgroup -g 1001 app && \
     adduser -u 1001 -G app -h /home/app -D app
 
-WORKDIR /home/app/backend-template
+WORKDIR /home/app/express-typescript-boilerplate
 
-RUN chown app:app /home/app/backend-template
+RUN chown app:app /home/app/express-typescript-boilerplate
 
 COPY --chown=app:app package*.json ./
 
@@ -46,8 +46,8 @@ FROM base AS production
 
 USER app
 
-COPY --from=prod-dependencies --chown=app:app /home/app/backend-template/node_modules ./node_modules
-COPY --from=builder --chown=app:app /home/app/backend-template/dist ./dist
+COPY --from=prod-dependencies --chown=app:app /home/app/express-typescript-boilerplate/node_modules ./node_modules
+COPY --from=builder --chown=app:app /home/app/express-typescript-boilerplate/dist ./dist
 COPY --chown=app:app package.json ./
 
 ENV NODE_ENV=production
