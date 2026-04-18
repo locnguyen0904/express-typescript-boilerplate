@@ -1,7 +1,7 @@
 {
   "name": "express-typescript-boilerplate",
   "version": "1.0.0",
-  "description": "Production-ready Express.js + TypeScript + PostgreSQL backend template",
+  "description": "Production-ready Express.js + TypeScript + PostgreSQL boilerplate",
   "main": "dist/server.js",
   "scripts": {
     "start": "node --import ./dist/instrumentation.js dist/server.js",

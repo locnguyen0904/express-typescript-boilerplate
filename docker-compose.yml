@@ -41,6 +41,26 @@ services:
     networks:
       - backend-network
 
+  backend:
+    build:
+      context: .
+      dockerfile: compose/backend/Dockerfile
+      target: development
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - .:/home/app/express-typescript-boilerplate
+      - /home/app/express-typescript-boilerplate/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - '3000:3000'
+    networks:
+      - backend-network
+
 volumes:
   postgres_data:
   redis_data:

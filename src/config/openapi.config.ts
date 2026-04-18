@@ -16,8 +16,9 @@ export const generateOpenApiDocs = () => {
     openapi: '3.0.0',
     info: {
       version: '1.0.0',
-      title: 'Backend Template API',
-      description: 'API documentation for the Backend Template project',
+      title: 'Express TypeScript Boilerplate API',
+      description:
+        'API documentation for the Express TypeScript Boilerplate project',
     },
     servers: [{ url: '/api/v1' }],
   });
