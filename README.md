@@ -21,23 +21,19 @@
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
 
-## Tech Stack
+## ✨ Features
 
-| Layer | Technology |
-|-------|-----------|
-| Runtime | Node.js 24 + TypeScript 5 |
-| Framework | Express.js 5 |
-| Database | PostgreSQL 16 + Drizzle ORM |
-| Cache | Redis 7 + ioredis |
-| Auth | JWT (access + refresh tokens, token revocation) |
-| Validation | Zod 4 + express-zod-safe |
-| API Docs | OpenAPI 3 (auto-generated via zod-to-openapi) |
-| DI | Inversify |
-| Logging | Pino (structured JSON) |
-| Jobs | BullMQ + Bull Board UI |
-| Security | Helmet, CORS, CSRF, rate limiting |
-| Testing | Jest 30 + Supertest |
-| Container | Docker Compose |
+- ⚡️ **Modern Stack:** Node.js 24, Express 5, and TypeScript 5.
+- 🗄️ **Database & ORM:** PostgreSQL 16 powered by the blazing-fast Drizzle ORM.
+- 🔐 **Bulletproof Security:** Helmet, CORS, CSRF protection, and Redis-backed Rate Limiting.
+- 🔑 **Authentication:** Robust JWT auth (access & refresh tokens) with token revocation via Redis.
+- ✅ **Type-safe Validation:** End-to-end type safety and request validation using Zod.
+- 📝 **Auto-generated API Docs:** OpenAPI 3 documentation automatically generated via `zod-to-openapi` and Swagger UI.
+- 🚀 **Background Jobs:** Built-in BullMQ integration with Bull Board UI for queue management.
+- 🏗️ **Solid Architecture:** Dependency Injection using Inversify and a clear Controller-Service-Repository pattern.
+- 📊 **Structured Logging:** Pino logger for JSON-formatted, performant logging.
+- 🐳 **Developer Experience:** Fully Dockerized (PostgreSQL, Redis) with Husky git hooks, ESLint, and Prettier.
+- 🧪 **Testing:** Configured with Jest and Supertest for Unit and E2E testing.
 
 ## Quick Start
 
@@ -129,18 +125,27 @@ Copy `.env.example` to `.env` and adjust values. Key variables:
 | `BULL_BOARD_USERNAME` | Bull Board UI username; mount `/admin/queues` only when set with password | -- |
 | `BULL_BOARD_PASSWORD` | Bull Board UI password; mount `/admin/queues` only when set with username | -- |
 
-## Architecture
+## 🏗️ Architecture
 
+```mermaid
+graph TD
+    Client([Client Request]) --> Routes[Express Routes / Zod Validation]
+    Routes --> Middleware[Middlewares: Auth, RateLimit, CSRF]
+    Middleware --> Controller[Controller]
+    Controller --> Service[Business Logic Service]
+    Service --> Repository[Data Repository / Drizzle ORM]
+    Service --> Redis[(Redis Cache/Jobs)]
+    Repository --> DB[(PostgreSQL)]
 ```
-Request → Routes → Middleware → Controller → Service → Repository → PostgreSQL
-```
+
+### Layer Responsibilities
 
 | Layer | Responsibility | Depends On |
 |-------|---------------|------------|
-| Routes | HTTP routing, request validation (Zod) | Controller |
-| Controller | Parse request, format response | Service |
-| Service | Business logic, orchestration | Repository |
-| Repository | Data access via Drizzle ORM | Database |
+| **Routes** | HTTP routing, request validation (Zod) | Controller |
+| **Controller** | Parse request, format response | Service |
+| **Service** | Business logic, orchestration | Repository |
+| **Repository** | Data access via Drizzle ORM | Database |
 
 Each feature module in `src/api/` follows this pattern. The `examples` module is a complete reference implementation.
 
