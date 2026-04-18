@@ -1,6 +1,6 @@
 # Boilerplate Hardening Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Fix the security and onboarding gaps in this Express boilerplate so refresh-token auth, CSRF, Bull Board exposure, and local Docker setup are safe and predictable by default.
 
@@ -51,7 +51,7 @@
 - Modify: `src/__tests__/api/auth/auth.e2e.test.ts:72-138`
 - Modify: `src/__tests__/helpers.ts:67-89`
 
-- [ ] **Step 1: Write the failing auth regression tests**
+- [x] **Step 1: Write the failing auth regression tests**
 
 Add these tests to `src/__tests__/api/auth/auth.e2e.test.ts`:
 
@@ -127,7 +127,7 @@ beforeEach(async () => {
 });
 ```
 
-- [ ] **Step 2: Run the auth test file to verify it fails**
+- [x] **Step 2: Run the auth test file to verify it fails**
 
 Run:
 
@@ -139,7 +139,7 @@ Expected:
 - FAIL on refresh-token replay test with `Expected: 401, Received: 200`
 - FAIL on refresh-after-logout test with `Expected: 401, Received: 200`
 
-- [ ] **Step 3: Add CSRF-aware test helpers**
+- [x] **Step 3: Add CSRF-aware test helpers**
 
 Update `src/__tests__/helpers.ts` with these helpers and make `loginAs()` use them:
 
@@ -182,7 +182,7 @@ export async function loginAs(
 }
 ```
 
-- [ ] **Step 4: Implement single-use refresh tokens and logout revocation**
+- [x] **Step 4: Implement single-use refresh tokens and logout revocation**
 
 Update `src/api/auth/auth.service.ts`:
 
@@ -276,7 +276,7 @@ async logout(req: Request, res: Response) {
 }
 ```
 
-- [ ] **Step 5: Run auth tests to verify they pass**
+- [x] **Step 5: Run auth tests to verify they pass**
 
 Run:
 
@@ -289,7 +289,7 @@ Expected:
 - replay test returns 401 on second refresh
 - logout invalidates the original refresh token
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/api/auth/auth.service.ts src/api/auth/auth.controller.ts src/__tests__/api/auth/auth.e2e.test.ts src/__tests__/helpers.ts
@@ -304,7 +304,7 @@ git commit -m "fix(auth): enforce refresh token revocation"
 - Modify: `src/__tests__/api/auth/auth.e2e.test.ts:30-138`
 - Modify: `src/__tests__/helpers.ts:67-89`
 
-- [ ] **Step 1: Write the failing middleware and E2E tests**
+- [x] **Step 1: Write the failing middleware and E2E tests**
 
 Update `src/__tests__/middlewares/csrf.middleware.test.ts` by replacing the bypass assertion with:
 
@@ -330,7 +330,7 @@ it('should reject login without CSRF token', async () => {
 });
 ```
 
-- [ ] **Step 2: Run the focused tests to verify they fail**
+- [x] **Step 2: Run the focused tests to verify they fail**
 
 Run:
 
@@ -342,7 +342,7 @@ Expected:
 - FAIL because `skipCsrfProtection({ headers: {} })` currently returns `true`
 - Existing login tests may also fail until they are updated to send CSRF token and cookie
 
-- [ ] **Step 3: Remove the header-omission bypass**
+- [x] **Step 3: Remove the header-omission bypass**
 
 Update `src/middlewares/csrf.middleware.ts` to:
 
@@ -367,7 +367,7 @@ const { doubleCsrfProtection, generateCsrfToken } = doubleCsrf({
 });
 ```
 
-- [ ] **Step 4: Update auth tests to use the CSRF bootstrap flow**
+- [x] **Step 4: Update auth tests to use the CSRF bootstrap flow**
 
 Use `getCsrfSession()` in all cookie-based POST tests in `src/__tests__/api/auth/auth.e2e.test.ts`. The login happy path should look like this:
 
@@ -397,7 +397,7 @@ const refreshRes = await request(app)
   .set('Cookie', Array.isArray(setCookieHeader) ? setCookieHeader.join('; ') : String(setCookieHeader));
 ```
 
-- [ ] **Step 5: Run the CSRF and auth suites**
+- [x] **Step 5: Run the CSRF and auth suites**
 
 Run:
 
@@ -410,7 +410,7 @@ Expected:
 - login without CSRF returns 403
 - login/refresh/logout with CSRF bootstrap flow still pass
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/middlewares/csrf.middleware.ts src/__tests__/middlewares/csrf.middleware.test.ts src/__tests__/api/auth/auth.e2e.test.ts src/__tests__/helpers.ts
@@ -427,7 +427,7 @@ git commit -m "fix(auth): require csrf for cookie requests"
 - Modify: `README.md:109-111,165-187`
 - Modify: `.env.example:49-53`
 
-- [ ] **Step 1: Write the failing config test**
+- [x] **Step 1: Write the failing config test**
 
 Add this test to `src/__tests__/config/feature-flags.test.ts`:
 
@@ -443,7 +443,7 @@ it('does not provide default Bull Board credentials when omitted', () => {
 });
 ```
 
-- [ ] **Step 2: Run the config test to verify it fails**
+- [x] **Step 2: Run the config test to verify it fails**
 
 Run:
 
@@ -454,7 +454,7 @@ npx jest src/__tests__/config/feature-flags.test.ts --runInBand --verbose
 Expected:
 - FAIL because env schema currently defaults both values to `'admin'`
 
-- [ ] **Step 3: Remove insecure defaults and gate route mounting**
+- [x] **Step 3: Remove insecure defaults and gate route mounting**
 
 Update `src/config/env.schema.ts`:
 
@@ -560,7 +560,7 @@ if (
 }
 ```
 
-- [ ] **Step 4: Update docs to require explicit credentials**
+- [x] **Step 4: Update docs to require explicit credentials**
 
 Update `.env.example` to remove insecure defaults:
 
@@ -578,7 +578,7 @@ Update README's environment table row to:
 | `BULL_BOARD_PASSWORD` | Bull Board UI password; mount `/admin/queues` only when set with username | -- |
 ```
 
-- [ ] **Step 5: Run the config test again**
+- [x] **Step 5: Run the config test again**
 
 Run:
 
@@ -590,7 +590,7 @@ Expected:
 - PASS
 - no default `admin/admin` behavior remains in config parsing
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/config/env.schema.ts src/config/env.config.ts src/app.ts src/__tests__/config/feature-flags.test.ts README.md .env.example
@@ -604,7 +604,7 @@ git commit -m "fix(config): remove insecure bull board defaults"
 - Modify: `README.md:23-45,165-187`
 - Modify: `.env.example:8-20`
 
-- [ ] **Step 1: Write the failing verification step**
+- [x] **Step 1: Write the failing verification step**
 
 Run:
 
@@ -616,7 +616,7 @@ Expected current output:
 - includes `backend`
 - this conflicts with README Quick Start, which tells users to run `npm run docker:up` and then `npm run dev` locally
 
-- [ ] **Step 2: Remove the dev backend service from `docker-compose.yml`**
+- [x] **Step 2: Remove the dev backend service from `docker-compose.yml`**
 
 Replace the service section so only `postgres` and `redis` remain. The resulting file should keep these services and remove the current `backend` block entirely:
 
@@ -662,7 +662,7 @@ services:
       - backend-network
 ```
 
-- [ ] **Step 3: Update Quick Start and Docker docs**
+- [x] **Step 3: Update Quick Start and Docker docs**
 
 Update `README.md` Quick Start to explicitly say infra-only Docker, then app runs locally:
 
@@ -696,7 +696,7 @@ Add one sentence below:
 The development Compose file starts infrastructure only. Run the API itself with `npm run dev`.
 ```
 
-- [ ] **Step 4: Keep `.env.example` local-dev friendly**
+- [x] **Step 4: Keep `.env.example` local-dev friendly**
 
 Keep these values as local-host defaults in `.env.example`:
 
@@ -712,7 +712,7 @@ Add a note immediately below them:
 # The production Compose file uses internal service hostnames instead.
 ```
 
-- [ ] **Step 5: Run the verification commands**
+- [x] **Step 5: Run the verification commands**
 
 Run:
 
@@ -732,7 +732,7 @@ npm run lint
 Expected:
 - PASS
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add docker-compose.yml README.md .env.example
@@ -744,7 +744,7 @@ git commit -m "docs: align local docker quick start"
 **Files:**
 - Test only, no code changes expected
 
-- [ ] **Step 1: Run focused regression suites**
+- [x] **Step 1: Run focused regression suites**
 
 Run:
 
@@ -755,7 +755,7 @@ npx jest src/__tests__/api/auth/auth.e2e.test.ts src/__tests__/middlewares/csrf.
 Expected:
 - PASS
 
-- [ ] **Step 2: Run full test suite**
+- [x] **Step 2: Run full test suite**
 
 Run:
 
@@ -766,7 +766,7 @@ npm test
 Expected:
 - PASS
 
-- [ ] **Step 3: Run lint**
+- [x] **Step 3: Run lint**
 
 Run:
 
@@ -777,7 +777,7 @@ npm run lint
 Expected:
 - PASS
 
-- [ ] **Step 4: Review the diff before handing off**
+- [x] **Step 4: Review the diff before handing off**
 
 Run:
 
@@ -788,7 +788,7 @@ git diff -- src/api/auth/auth.service.ts src/api/auth/auth.controller.ts src/mid
 Expected:
 - only the planned auth, CSRF, config, compose, and doc changes appear
 
-- [ ] **Step 5: Create the final commit**
+- [x] **Step 5: Create the final commit**
 
 ```bash
 git add src/api/auth/auth.service.ts src/api/auth/auth.controller.ts src/middlewares/csrf.middleware.ts src/config/env.schema.ts src/config/env.config.ts src/app.ts src/__tests__/api/auth/auth.e2e.test.ts src/__tests__/middlewares/csrf.middleware.test.ts src/__tests__/config/feature-flags.test.ts src/__tests__/helpers.ts docker-compose.yml README.md .env.example

@@ -36,9 +36,6 @@ const envSchema = z.object({
   JOBS_ENABLED: booleanFlag(true),
   ALLOWED_ORIGINS: z.string().optional(),
   LOG_LEVEL: z.string().optional(),
-  OTEL_ENABLED: z.string().optional(),
-  OTEL_EXPORTER_ENDPOINT: z.string().optional(),
-  OTEL_SERVICE_NAME: z.string().optional(),
   BULL_BOARD_USERNAME: z.string().min(1).optional(),
   BULL_BOARD_PASSWORD: z.string().min(1).optional(),
 });

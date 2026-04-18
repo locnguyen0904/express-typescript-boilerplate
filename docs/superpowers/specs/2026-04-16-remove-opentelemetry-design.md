@@ -1,7 +1,7 @@
 # Remove OpenTelemetry Instrumentation
 
 **Date:** 2026-04-16
-**Status:** Approved
+**Status:** Completed
 
 ## Goal
 

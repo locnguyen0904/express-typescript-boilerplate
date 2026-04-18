@@ -1,6 +1,6 @@
 # Simplify Error Handler Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Remove dead ZodError handling and consolidate PostgreSQL error helpers into a single lookup function.
 
@@ -25,7 +25,7 @@
 - Modify: `src/__tests__/helpers/handle-errors.helper.test.ts:100-130`
 - Modify: `src/helpers/handle-errors.helper.ts:2,45-60`
 
-- [ ] **Step 1: Remove the ZodError test case**
+- [x] **Step 1: Remove the ZodError test case**
 
 In `src/__tests__/helpers/handle-errors.helper.test.ts`, delete the ZodError test (lines 100-130) and remove the `ZodError` import from line 2:
 
@@ -44,12 +44,12 @@ Delete the entire test block:
     });
 ```
 
-- [ ] **Step 2: Run tests to verify the ZodError test is gone and remaining tests still pass**
+- [x] **Step 2: Run tests to verify the ZodError test is gone and remaining tests still pass**
 
 Run: `npx jest src/__tests__/helpers/handle-errors.helper.test.ts --verbose`
 Expected: 7 tests pass (was 8), no ZodError test listed.
 
-- [ ] **Step 3: Remove ZodError handling from the error handler**
+- [x] **Step 3: Remove ZodError handling from the error handler**
 
 In `src/helpers/handle-errors.helper.ts`:
 
@@ -105,12 +105,12 @@ interface ProblemDetail {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify everything passes**
+- [x] **Step 4: Run tests to verify everything passes**
 
 Run: `npx jest src/__tests__/helpers/handle-errors.helper.test.ts --verbose`
 Expected: All 7 remaining tests pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/helpers/handle-errors.helper.ts src/__tests__/helpers/handle-errors.helper.test.ts
@@ -124,12 +124,12 @@ git commit -m "refactor(core): remove dead zodError handling from global error h
 **Files:**
 - Modify: `src/helpers/handle-errors.helper.ts:62-135`
 
-- [ ] **Step 1: Run existing PG error tests to confirm baseline**
+- [x] **Step 1: Run existing PG error tests to confirm baseline**
 
 Run: `npx jest src/__tests__/helpers/handle-errors.helper.test.ts -t "PostgreSQL" --verbose`
 Expected: Both "duplicate key error (23505)" and "invalid input error (22P02)" pass.
 
-- [ ] **Step 2: Replace three PG helper functions with one consolidated handler**
+- [x] **Step 2: Replace three PG helper functions with one consolidated handler**
 
 In `src/helpers/handle-errors.helper.ts`, delete the three functions `isDuplicateKeyError` (lines 107-118), `extractDuplicateDetail` (lines 120-129), and `isInvalidInputError` (lines 131-135). Replace them with a single map-based function placed just above `logErrors`:
 
@@ -157,7 +157,7 @@ const handlePgError = (
 };
 ```
 
-- [ ] **Step 3: Replace the two PG branches in `errorHandle` with one**
+- [x] **Step 3: Replace the two PG branches in `errorHandle` with one**
 
 In the `errorHandle` function, replace the two separate `if` blocks:
 
@@ -206,22 +206,22 @@ With one block:
   }
 ```
 
-- [ ] **Step 4: Run all error handler tests**
+- [x] **Step 4: Run all error handler tests**
 
 Run: `npx jest src/__tests__/helpers/handle-errors.helper.test.ts --verbose`
 Expected: All 7 tests pass. PG tests pass with identical assertions (same status codes, titles, details, codes).
 
-- [ ] **Step 5: Run full test suite**
+- [x] **Step 5: Run full test suite**
 
 Run: `npm test`
 Expected: All tests pass.
 
-- [ ] **Step 6: Run build**
+- [x] **Step 6: Run build**
 
 Run: `npm run build`
 Expected: Build succeeds with no TypeScript errors.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/helpers/handle-errors.helper.ts
