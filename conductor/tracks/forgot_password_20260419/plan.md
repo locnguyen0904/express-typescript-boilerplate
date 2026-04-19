@@ -2,7 +2,7 @@
 
 ## Phase 1: Database & Token Management
 - [x] Task: Write Tests for Reset Token Storage 50bd918
-- [ ] Task: Implement Reset Token Schema (Drizzle ORM) or Redis Storage Logic
+- [x] Task: Implement Reset Token Schema (Drizzle ORM) or Redis Storage Logic b0ecf69
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Database & Token Management' (Protocol in workflow.md)
 
 ## Phase 2: Forgot Password Request (Email Generation)
