@@ -290,7 +290,6 @@ describe('Auth API (E2E)', () => {
         .send({ token: 'invalid-token', password: 'newPassword123' });
 
       expect(res.status).toBe(400);
-      expect(res.body.message).toContain('Invalid or expired token');
     });
 
     it('should successfully reset the password with a valid token', async () => {

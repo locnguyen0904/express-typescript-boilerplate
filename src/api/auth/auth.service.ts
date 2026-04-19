@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 import { IUser } from '@/api/users/user.interface';
 import UserService from '@/api/users/user.service';
 import { config } from '@/config';
-import { UnAuthorizedError } from '@/core';
+import { BadRequestError, UnAuthorizedError } from '@/core';
 import { TOKENS } from '@/di/tokens';
 import { addEmailJob } from '@/jobs/queues/email.queue';
 import logger from '@/services/logger.service';
@@ -43,6 +43,17 @@ export default class AuthService {
       subject: 'Password Reset Request',
       body: `You requested a password reset. Click the link to reset your password: ${resetLink}`,
     });
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const userId = await this.passwordResetTokenService.validateToken(token);
+
+    if (!userId) {
+      throw new BadRequestError('Invalid or expired token');
+    }
+
+    const hashedPassword = await argon2.hash(newPassword);
+    await this.userService.update(userId, { password: hashedPassword });
   }
 
   async loginWithEmailAndPassword(

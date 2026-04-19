@@ -16,3 +16,11 @@ export const forgotPasswordSchema = registry.register(
     email: z.email().openapi({ example: 'user@example.com' }),
   })
 );
+
+export const resetPasswordSchema = registry.register(
+  'ResetPassword',
+  z.object({
+    token: z.string().openapi({ example: 'abc123token' }),
+    password: z.string().min(8).openapi({ example: 'newPassword123' }),
+  })
+);

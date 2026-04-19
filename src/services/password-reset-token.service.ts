@@ -15,7 +15,7 @@ export default class PasswordResetTokenService {
   ) {}
 
   async generateToken(
-    userId: number,
+    userId: string,
     ttlSeconds: number = 900
   ): Promise<string> {
     if (!this.redis.isConnected) {
@@ -33,7 +33,7 @@ export default class PasswordResetTokenService {
     return rawToken;
   }
 
-  async validateToken(rawToken: string): Promise<number | null> {
+  async validateToken(rawToken: string): Promise<string | null> {
     if (!this.redis.isConnected) {
       return null;
     }
@@ -44,7 +44,7 @@ export default class PasswordResetTokenService {
       .digest('hex');
     const key = `${PREFIX}${hashedToken}`;
 
-    const userId = await this.redis.get<number>(key);
+    const userId = await this.redis.get<string>(key);
 
     if (userId !== null) {
       await this.redis.del(key);

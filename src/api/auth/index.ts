@@ -3,7 +3,11 @@ import './auth.doc';
 import { Router } from 'express';
 import validate from 'express-zod-safe';
 
-import { forgotPasswordSchema, loginSchema } from '@/api/auth/auth.validation';
+import {
+  forgotPasswordSchema,
+  loginSchema,
+  resetPasswordSchema,
+} from '@/api/auth/auth.validation';
 import { container, TOKENS } from '@/di';
 import { authLimiter } from '@/middlewares';
 
@@ -24,6 +28,13 @@ router.post(
   authLimiter,
   validate({ body: forgotPasswordSchema }),
   controller.forgotPassword
+);
+
+router.post(
+  '/reset-password',
+  authLimiter,
+  validate({ body: resetPasswordSchema }),
+  controller.resetPassword
 );
 
 router.post('/refresh-token', controller.refreshToken);

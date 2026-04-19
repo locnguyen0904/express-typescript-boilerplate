@@ -20,7 +20,7 @@ describe('PasswordResetTokenService', () => {
     it('should generate a token, store its hashed value in Redis, and return the raw token', async () => {
       mockRedis.set.mockResolvedValue(true);
 
-      const token = await service.generateToken(1, 900); // 15 mins
+      const token = await service.generateToken('123-abc', 900); // 15 mins
 
       expect(token).toBeDefined();
       expect(typeof token).toBe('string');
@@ -30,13 +30,13 @@ describe('PasswordResetTokenService', () => {
       const setCall = mockRedis.set.mock.calls[0];
       const key = setCall[0];
       expect(key.startsWith('token:reset:')).toBe(true);
-      expect(setCall[1]).toBe(1); // Value is the user ID
+      expect(setCall[1]).toBe('123-abc'); // Value is the user ID
       expect(setCall[2]).toBe(900); // TTL in seconds
     });
 
     it('should throw an error if Redis is not connected', async () => {
       mockRedis.isConnected = false;
-      await expect(service.generateToken(1, 900)).rejects.toThrow(
+      await expect(service.generateToken('123-abc', 900)).rejects.toThrow(
         'Redis is not connected'
       );
     });
@@ -45,12 +45,12 @@ describe('PasswordResetTokenService', () => {
   describe('validateToken', () => {
     it('should return userId and delete token if valid', async () => {
       const rawToken = 'test-token';
-      mockRedis.get.mockResolvedValue(1);
+      mockRedis.get.mockResolvedValue('123-abc');
       mockRedis.del.mockResolvedValue(true);
 
       const userId = await service.validateToken(rawToken);
 
-      expect(userId).toBe(1);
+      expect(userId).toBe('123-abc');
       expect(mockRedis.get).toHaveBeenCalledTimes(1);
       expect(mockRedis.del).toHaveBeenCalledTimes(1);
 

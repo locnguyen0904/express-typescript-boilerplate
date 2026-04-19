@@ -75,6 +75,15 @@ export default class AuthController {
     }).send(res);
   }
 
+  async resetPassword(req: Request, res: Response) {
+    const { token, password } = req.body;
+    await this.authService.resetPassword(token, password);
+
+    new SuccessResponse({
+      message: 'Password reset successfully',
+    }).send(res);
+  }
+
   async logout(req: Request, res: Response) {
     // Revoke the access token if present
     const authHeader = req.headers.authorization;
