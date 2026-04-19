@@ -7,11 +7,13 @@ describe('PasswordResetTokenService', () => {
 
   beforeEach(() => {
     mockRedis = {
-      isConnected: true,
+      get isConnected() {
+        return true;
+      },
       set: jest.fn(),
       get: jest.fn(),
       del: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<RedisService>;
 
     service = new PasswordResetTokenService(mockRedis);
   });
@@ -35,7 +37,7 @@ describe('PasswordResetTokenService', () => {
     });
 
     it('should throw an error if Redis is not connected', async () => {
-      (mockRedis as any).isConnected = false;
+      jest.spyOn(mockRedis, 'isConnected', 'get').mockReturnValue(false);
       await expect(service.generateToken('123-abc', 900)).rejects.toThrow(
         'Redis is not connected'
       );
@@ -68,7 +70,7 @@ describe('PasswordResetTokenService', () => {
     });
 
     it('should return null if Redis is not connected', async () => {
-      (mockRedis as any).isConnected = false;
+      jest.spyOn(mockRedis, 'isConnected', 'get').mockReturnValue(false);
       const userId = await service.validateToken('test-token');
       expect(userId).toBeNull();
     });
