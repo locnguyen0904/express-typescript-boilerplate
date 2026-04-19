@@ -8,8 +8,8 @@
 ## Phase 2: Forgot Password Request (Email Generation)
 - [x] Task: Write Tests for Forgot Password Endpoint 182cd21
 - [x] Task: Implement Forgot Password Controller and Service 2f1b641
-- [ ] Task: Write Tests for Email Queue Worker
-- [ ] Task: Implement Email Queue Worker (BullMQ) for Reset Link
+- [x] Task: Write Tests for Email Queue Worker d934f9d
+- [~] Task: Implement Email Queue Worker (BullMQ) for Reset Link
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Forgot Password Request (Email Generation)' (Protocol in workflow.md)
 
 ## Phase 3: Password Reset Execution
