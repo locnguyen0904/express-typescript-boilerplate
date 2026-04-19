@@ -268,4 +268,61 @@ describe('Auth API (E2E)', () => {
       expect(res.body.message).toContain('If that email is registered');
     });
   });
+
+  // ──────────────── RESET PASSWORD ────────────────
+
+  describe('POST /api/v1/auth/reset-password', () => {
+    it('should return 400 if token or password is missing', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/reset-password')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader)
+        .send({ token: 'something' });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 400 for an invalid or expired token', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/reset-password')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader)
+        .send({ token: 'invalid-token', password: 'newPassword123' });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toContain('Invalid or expired token');
+    });
+
+    it('should successfully reset the password with a valid token', async () => {
+      const passwordResetTokenService = container.get<any>(
+        TOKENS.PasswordResetTokenService
+      );
+      const userRes = await request(app)
+        .post('/api/v1/auth/login')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader)
+        .send({ email: TEST_ADMIN.email, password: TEST_ADMIN.password });
+
+      const userId = userRes.body.data.user.id;
+      const token = await passwordResetTokenService.generateToken(userId);
+
+      const res = await request(app)
+        .post('/api/v1/auth/reset-password')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader)
+        .send({ token, password: 'newPassword123' });
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toContain('Password reset successfully');
+
+      // Verify login with new password works
+      const loginRes = await request(app)
+        .post('/api/v1/auth/login')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader)
+        .send({ email: TEST_ADMIN.email, password: 'newPassword123' });
+
+      expect(loginRes.status).toBe(200);
+    });
+  });
 });
