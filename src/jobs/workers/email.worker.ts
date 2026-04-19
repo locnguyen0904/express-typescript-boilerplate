@@ -1,15 +1,19 @@
 import { type ConnectionOptions, Job, Worker } from 'bullmq';
 
+import { logger } from '@/services';
+
 import { getRedisConnection } from '../index';
 import { EmailJobData } from '../queues/email.queue';
 
 let emailWorker: Worker<EmailJobData> | null = null;
 
-async function processEmail(job: Job<EmailJobData>): Promise<void> {
-  const { to, subject } = job.data;
+export async function processEmail(job: Job<EmailJobData>): Promise<void> {
+  const { to, subject, body } = job.data;
 
   // TODO: Replace with actual email sending logic (e.g., nodemailer, SendGrid, SES)
-  console.log(`[Email Worker] Sending email to=${to} subject="${subject}"`);
+  logger.info(
+    `[Email Worker] Sending email to=${to} subject="${subject}" body="${body}"`
+  );
 
   // Simulate email sending delay
   await new Promise((resolve) => setTimeout(resolve, 100));
@@ -25,11 +29,11 @@ export function createEmailWorker(): Worker<EmailJobData> | null {
   });
 
   emailWorker.on('completed', (job) => {
-    console.log(`[Email Worker] Job ${job.id} completed`);
+    logger.info(`[Email Worker] Job ${job.id} completed`);
   });
 
   emailWorker.on('failed', (job, err) => {
-    console.error(`[Email Worker] Job ${job?.id} failed: ${err.message}`);
+    logger.error(`[Email Worker] Job ${job?.id} failed: ${err.message}`);
   });
 
   return emailWorker;
