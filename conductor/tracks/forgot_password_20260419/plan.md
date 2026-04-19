@@ -1,7 +1,7 @@
 # Implementation Plan: Add forgot password and password reset functionality
 
 ## Phase 1: Database & Token Management
-- [ ] Task: Write Tests for Reset Token Storage
+- [x] Task: Write Tests for Reset Token Storage 50bd918
 - [ ] Task: Implement Reset Token Schema (Drizzle ORM) or Redis Storage Logic
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Database & Token Management' (Protocol in workflow.md)
 
