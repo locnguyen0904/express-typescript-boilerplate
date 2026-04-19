@@ -2,6 +2,7 @@ import request from 'supertest';
 
 import app from '@/app';
 import { container, TOKENS } from '@/di';
+import { PasswordResetTokenService } from '@/services';
 import RedisService from '@/services/redis.service';
 
 import {

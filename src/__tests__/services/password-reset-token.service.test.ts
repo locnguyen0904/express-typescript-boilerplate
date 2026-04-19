@@ -35,7 +35,7 @@ describe('PasswordResetTokenService', () => {
     });
 
     it('should throw an error if Redis is not connected', async () => {
-      mockRedis.isConnected = false;
+      (mockRedis as any).isConnected = false;
       await expect(service.generateToken('123-abc', 900)).rejects.toThrow(
         'Redis is not connected'
       );
@@ -68,7 +68,7 @@ describe('PasswordResetTokenService', () => {
     });
 
     it('should return null if Redis is not connected', async () => {
-      mockRedis.isConnected = false;
+      (mockRedis as any).isConnected = false;
       const userId = await service.validateToken('test-token');
       expect(userId).toBeNull();
     });
