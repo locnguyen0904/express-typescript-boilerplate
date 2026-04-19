@@ -13,7 +13,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Forgot Password Request (Email Generation)' (Protocol in workflow.md) 80671c0
 
 ## Phase 3: Password Reset Execution
-- [ ] Task: Write Tests for Reset Password Endpoint
-- [ ] Task: Implement Reset Password Controller and Service (Token Validation & Password Update)
+- [x] Task: Write Tests for Reset Password Endpoint f053d93
+- [~] Task: Implement Reset Password Controller and Service (Token Validation & Password Update)
 - [ ] Task: Update OpenAPI Documentation for New Endpoints
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Password Reset Execution' (Protocol in workflow.md)
