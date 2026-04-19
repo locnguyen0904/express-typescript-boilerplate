@@ -23,7 +23,7 @@ git checkout main && git pull origin main
 git checkout -b feature/my-feature
 
 # Make changes, then verify
-npm run prettier:fix && npm run lint && npm test
+npm run prettier:fix && npm run lint && npm run test:up && npm test && npm run test:down
 
 # Commit and push
 git add .
@@ -77,7 +77,9 @@ chore(deps): upgrade drizzle-orm to v0.45
 ```bash
 npm run prettier:fix    # Format code
 npm run lint            # Check for issues
+npm run test:up         # Start test DB
 npm test                # Run tests
+npm run test:down       # Stop test DB
 ```
 
 These checks also run automatically via husky pre-commit hooks.

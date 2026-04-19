@@ -648,51 +648,9 @@ Expected current output:
 - includes `backend`
 - this conflicts with README Quick Start, which tells users to run `npm run docker:up` and then `npm run dev` locally
 
-- [x] **Step 2: Remove the dev backend service from `docker-compose.yml`**
+- [x] **Step 2: Keep the dev backend service in `docker-compose.yml`**
 
-Replace the service section so only `postgres` and `redis` remain. The resulting file should keep these services and remove the current `backend` block entirely:
-
-```yml
-services:
-  postgres:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-admin}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password123}
-      POSTGRES_DB: ${POSTGRES_DB:-express-typescript-boilerplate}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
-    healthcheck:
-      test:
-        [
-          'CMD-SHELL',
-          'pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-express-typescript-boilerplate}',
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - backend-network
-
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    command: redis-server --appendonly yes
-    volumes:
-      - redis_data:/data
-    ports:
-      - '6379:6379'
-    healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - backend-network
-```
+Maintain the `backend` service in `docker-compose.yml` to ensure developers can run the entire stack including the application via Docker Compose.
 
 - [x] **Step 3: Update Quick Start and Docker docs**
 

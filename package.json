@@ -22,7 +22,9 @@
     "db:studio": "drizzle-kit studio",
     "prepare": "husky",
     "docker:up": "docker compose up -d",
-    "docker:down": "docker compose down"
+    "docker:down": "docker compose down",
+    "test:up": "docker compose -f docker-compose.test.yml up -d --wait",
+    "test:down": "docker compose -f docker-compose.test.yml down"
   },
   "keywords": [],
   "author": "Loc Nguyen",
