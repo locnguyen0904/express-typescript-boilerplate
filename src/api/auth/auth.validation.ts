@@ -9,3 +9,10 @@ export const loginSchema = registry.register(
     password: z.string().openapi({ example: 'password123' }),
   })
 );
+
+export const forgotPasswordSchema = registry.register(
+  'ForgotPassword',
+  z.object({
+    email: z.email().openapi({ example: 'user@example.com' }),
+  })
+);

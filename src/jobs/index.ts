@@ -6,8 +6,6 @@ import { container, TOKENS } from '@/di';
 import { logger } from '@/services';
 import RedisService from '@/services/redis.service';
 
-const redisService = container.get<RedisService>(TOKENS.RedisService);
-
 import { createEmailQueue } from './queues/email.queue';
 import { closeEmailWorker, createEmailWorker } from './workers/email.worker';
 
@@ -21,6 +19,8 @@ export function getRedisConnection(): IORedis | null {
 }
 
 export async function initializeJobs(): Promise<void> {
+  const redisService = container.get<RedisService>(TOKENS.RedisService);
+
   if (!config.features.jobsEnabled) {
     logger.info('Jobs disabled via JOBS_ENABLED=false');
     return;

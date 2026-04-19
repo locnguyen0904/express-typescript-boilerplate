@@ -65,6 +65,16 @@ export default class AuthController {
     }
   }
 
+  async forgotPassword(req: Request, res: Response) {
+    const { email } = req.body;
+    await this.authService.forgotPassword(email);
+
+    new SuccessResponse({
+      message:
+        'If that email is registered, you will receive a password reset link shortly.',
+    }).send(res);
+  }
+
   async logout(req: Request, res: Response) {
     // Revoke the access token if present
     const authHeader = req.headers.authorization;

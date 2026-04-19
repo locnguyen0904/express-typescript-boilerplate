@@ -9,7 +9,9 @@ import UserService from '@/api/users/user.service';
 import { config } from '@/config';
 import { UnAuthorizedError } from '@/core';
 import { TOKENS } from '@/di/tokens';
+import { addEmailJob } from '@/jobs/queues/email.queue';
 import logger from '@/services/logger.service';
+import PasswordResetTokenService from '@/services/password-reset-token.service';
 import TokenBlacklistService from '@/services/token-blacklist.service';
 
 import { AuthTokens } from './auth.interface';
@@ -19,8 +21,29 @@ export default class AuthService {
   constructor(
     @inject(TOKENS.UserService) private userService: UserService,
     @inject(TOKENS.TokenBlacklistService)
-    private tokenBlacklist: TokenBlacklistService
+    private tokenBlacklist: TokenBlacklistService,
+    @inject(TOKENS.PasswordResetTokenService)
+    private passwordResetTokenService: PasswordResetTokenService
   ) {}
+
+  async forgotPassword(email: string): Promise<void> {
+    const user = await this.userService.findByEmailWithPassword(email);
+    if (!user) {
+      // Return immediately to prevent email enumeration
+      return;
+    }
+
+    const resetToken = await this.passwordResetTokenService.generateToken(
+      user.id
+    );
+    const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+
+    await addEmailJob({
+      to: user.email,
+      subject: 'Password Reset Request',
+      body: `You requested a password reset. Click the link to reset your password: ${resetLink}`,
+    });
+  }
 
   async loginWithEmailAndPassword(
     email: string,
