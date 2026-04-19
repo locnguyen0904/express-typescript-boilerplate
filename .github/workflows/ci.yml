@@ -30,8 +30,15 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Start test infrastructure
+        run: docker compose -f docker-compose.test.yml up -d --wait
+
       - name: Test with coverage
         run: npm run test:coverage
+
+      - name: Stop test infrastructure
+        if: always()
+        run: docker compose -f docker-compose.test.yml down
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4

@@ -110,7 +110,9 @@ src/
 | `npm run dev` | Start dev server with hot-reload (tsx) |
 | `npm run build` | Compile TypeScript to `dist/` |
 | `npm start` | Run production build |
-| `npm test` | Run all tests (Jest) |
+| `npm run test:up` | Spin up test DB & Redis |
+| `npm test` | Run all tests (requires test DB) |
+| `npm run test:down` | Stop test DB & Redis |
 | `npm run lint:fix` | Auto-fix ESLint errors |
 | `npm run prettier:fix`| Format codebase |
 | `npm run db:push` | Sync schema to database |

@@ -3,9 +3,8 @@
 // Must match src/config/env.schema.ts
 // ──────────────────────────────────────────────
 process.env.DATABASE_URL =
-  process.env.DATABASE_URL ||
-  'postgresql://admin:password123@localhost:5432/express-typescript-boilerplate-test';
-process.env.REDIS_URL = 'redis://localhost:6379';
+  'postgresql://admin:password123@localhost:5433/express-typescript-boilerplate-test';
+process.env.REDIS_URL = 'redis://localhost:6380';
 process.env.JWT_SECRET = 'test-secret-key-32-characters-long-minimum-integrity';
 process.env.JWT_ACCESS_EXPIRATION_MINUTES = '30';
 process.env.JWT_REFRESH_EXPIRATION_DAYS = '30';
