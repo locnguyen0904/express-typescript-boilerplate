@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: Documentation
-    url: https://github.com/locnguyen0904/backend-template#readme
+    url: https://github.com/locnguyen0904/express-typescript-boilerplate#readme
     about: Check the documentation before opening an issue

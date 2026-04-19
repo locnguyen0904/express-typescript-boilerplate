@@ -12,44 +12,45 @@
 
 ## File Structure
 
-| File | Action | Responsibility |
-|------|--------|----------------|
-| `README.md` | Create | Primary documentation -- tech stack, quick start, project structure, scripts, env vars, architecture, module creation, testing, docker |
-| `CONTRIBUTING.md` | Create | Contributor guide -- git flow, commit convention, code standards, PR guidelines |
+| File              | Action | Responsibility                                                                                                                         |
+| ----------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `README.md`       | Create | Primary documentation -- tech stack, quick start, project structure, scripts, env vars, architecture, module creation, testing, docker |
+| `CONTRIBUTING.md` | Create | Contributor guide -- git flow, commit convention, code standards, PR guidelines                                                        |
 
 ---
 
 ### Task 1: Create README.md
 
 **Files:**
+
 - Create: `README.md`
 
 - [ ] **Step 1: Create README.md with full content**
 
 Create `README.md` at the project root with the following content:
 
-```markdown
+````markdown
 # Backend Template
 
 Production-ready Express.js + TypeScript + PostgreSQL backend template with best practices.
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Runtime | Node.js 24 + TypeScript 5 |
-| Framework | Express.js 5 |
-| Database | PostgreSQL 16 + Drizzle ORM |
-| Cache | Redis 7 + ioredis |
-| Auth | JWT (access + refresh tokens, token revocation) |
-| Validation | Zod 4 + express-zod-safe |
-| API Docs | OpenAPI 3 (auto-generated via zod-to-openapi) |
-| DI | Inversify |
-| Logging | Pino (structured JSON) |
-| Jobs | BullMQ + Bull Board UI |
-| Security | Helmet, CORS, CSRF, rate limiting |
-| Testing | Jest 30 + Supertest |
-| Container | Docker Compose |
+| Layer      | Technology                                      |
+| ---------- | ----------------------------------------------- |
+| Runtime    | Node.js 24 + TypeScript 5                       |
+| Framework  | Express.js 5                                    |
+| Database   | PostgreSQL 16 + Drizzle ORM                     |
+| Cache      | Redis 7 + ioredis                               |
+| Auth       | JWT (access + refresh tokens, token revocation) |
+| Validation | Zod 4 + express-zod-safe                        |
+| API Docs   | OpenAPI 3 (auto-generated via zod-to-openapi)   |
+| DI         | Inversify                                       |
+| Logging    | Pino (structured JSON)                          |
+| Jobs       | BullMQ + Bull Board UI                          |
+| Security   | Helmet, CORS, CSRF, rate limiting               |
+| Testing    | Jest 30 + Supertest                             |
+| Container  | Docker Compose                                  |
 
 ## Quick Start
 
@@ -72,6 +73,7 @@ npm run seed:dev
 # Start dev server
 npm run dev
 ```
+````
 
 The API runs at `http://localhost:3000`. OpenAPI docs are available at `http://localhost:3000/api-docs`.
 
@@ -103,43 +105,43 @@ src/
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start dev server with hot reload |
-| `npm run build` | Build for production |
-| `npm start` | Run production build |
-| `npm test` | Run all tests |
-| `npm run test:coverage` | Run tests with coverage report |
-| `npm run lint` | Check for lint errors |
-| `npm run lint:fix` | Auto-fix lint errors |
-| `npm run prettier:fix` | Format code |
-| `npm run db:generate` | Generate Drizzle migration |
-| `npm run db:migrate` | Run migrations |
-| `npm run db:push` | Push schema to database (dev) |
-| `npm run db:studio` | Open Drizzle Studio UI |
-| `npm run seed:dev` | Seed database (dev) |
-| `npm run docker:up` | Start Docker services |
-| `npm run docker:down` | Stop Docker services |
+| Command                 | Description                      |
+| ----------------------- | -------------------------------- |
+| `npm run dev`           | Start dev server with hot reload |
+| `npm run build`         | Build for production             |
+| `npm start`             | Run production build             |
+| `npm test`              | Run all tests                    |
+| `npm run test:coverage` | Run tests with coverage report   |
+| `npm run lint`          | Check for lint errors            |
+| `npm run lint:fix`      | Auto-fix lint errors             |
+| `npm run prettier:fix`  | Format code                      |
+| `npm run db:generate`   | Generate Drizzle migration       |
+| `npm run db:migrate`    | Run migrations                   |
+| `npm run db:push`       | Push schema to database (dev)    |
+| `npm run db:studio`     | Open Drizzle Studio UI           |
+| `npm run seed:dev`      | Seed database (dev)              |
+| `npm run docker:up`     | Start Docker services            |
+| `npm run docker:down`   | Stop Docker services             |
 
 ## Environment Variables
 
 Copy `.env.example` to `.env` and adjust values. Key variables:
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://admin:password123@localhost:5432/backend-template` |
-| `REDIS_URL` | Redis connection string | `redis://localhost:6379` |
-| `JWT_SECRET` | JWT signing key (min 32 chars) | -- |
-| `JWT_ACCESS_EXPIRATION_MINUTES` | Access token TTL | `30` |
-| `JWT_REFRESH_EXPIRATION_DAYS` | Refresh token TTL | `30` |
-| `NODE_ENV` | Environment | `development` |
-| `PORT` | Server port | `3000` |
-| `LOG_LEVEL` | Pino log level | `debug` |
-| `CACHE_ENABLED` | Enable Redis caching | `true` |
-| `JOBS_ENABLED` | Enable BullMQ workers | `true` |
-| `ALLOWED_ORIGINS` | CORS allowed origins (comma-separated) | -- |
-| `BULL_BOARD_USERNAME` | Bull Board UI username | `admin` |
-| `BULL_BOARD_PASSWORD` | Bull Board UI password | `admin` |
+| Variable                        | Description                            | Default                                                                        |
+| ------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------ |
+| `DATABASE_URL`                  | PostgreSQL connection string           | `postgresql://admin:password123@localhost:5432/express-typescript-boilerplate` |
+| `REDIS_URL`                     | Redis connection string                | `redis://localhost:6379`                                                       |
+| `JWT_SECRET`                    | JWT signing key (min 32 chars)         | --                                                                             |
+| `JWT_ACCESS_EXPIRATION_MINUTES` | Access token TTL                       | `30`                                                                           |
+| `JWT_REFRESH_EXPIRATION_DAYS`   | Refresh token TTL                      | `30`                                                                           |
+| `NODE_ENV`                      | Environment                            | `development`                                                                  |
+| `PORT`                          | Server port                            | `3000`                                                                         |
+| `LOG_LEVEL`                     | Pino log level                         | `debug`                                                                        |
+| `CACHE_ENABLED`                 | Enable Redis caching                   | `true`                                                                         |
+| `JOBS_ENABLED`                  | Enable BullMQ workers                  | `true`                                                                         |
+| `ALLOWED_ORIGINS`               | CORS allowed origins (comma-separated) | --                                                                             |
+| `BULL_BOARD_USERNAME`           | Bull Board UI username                 | `admin`                                                                        |
+| `BULL_BOARD_PASSWORD`           | Bull Board UI password                 | `admin`                                                                        |
 
 ## Architecture
 
@@ -147,12 +149,12 @@ Copy `.env.example` to `.env` and adjust values. Key variables:
 Request → Routes → Middleware → Controller → Service → Repository → PostgreSQL
 ```
 
-| Layer | Responsibility | Depends On |
-|-------|---------------|------------|
-| Routes | HTTP routing, request validation (Zod) | Controller |
-| Controller | Parse request, format response | Service |
-| Service | Business logic, orchestration | Repository |
-| Repository | Data access via Drizzle ORM | Database |
+| Layer      | Responsibility                         | Depends On |
+| ---------- | -------------------------------------- | ---------- |
+| Routes     | HTTP routing, request validation (Zod) | Controller |
+| Controller | Parse request, format response         | Service    |
+| Service    | Business logic, orchestration          | Repository |
+| Repository | Data access via Drizzle ORM            | Database   |
 
 Each feature module in `src/api/` follows this pattern. The `examples` module is a complete reference implementation.
 
@@ -160,16 +162,16 @@ Each feature module in `src/api/` follows this pattern. The `examples` module is
 
 Follow the `src/api/examples/` module as a reference. Each module needs:
 
-| File | Purpose |
-|------|---------|
-| `src/db/schema/<name>s.ts` | Drizzle table definition |
-| `src/api/<name>/<name>.interface.ts` | TypeScript types |
-| `src/api/<name>/<name>.validation.ts` | Zod request schemas |
-| `src/api/<name>/<name>.repository.ts` | Database queries |
-| `src/api/<name>/<name>.service.ts` | Business logic |
-| `src/api/<name>/<name>.controller.ts` | Request handlers |
-| `src/api/<name>/<name>.doc.ts` | OpenAPI documentation |
-| `src/api/<name>/index.ts` | Route definitions |
+| File                                  | Purpose                  |
+| ------------------------------------- | ------------------------ |
+| `src/db/schema/<name>s.ts`            | Drizzle table definition |
+| `src/api/<name>/<name>.interface.ts`  | TypeScript types         |
+| `src/api/<name>/<name>.validation.ts` | Zod request schemas      |
+| `src/api/<name>/<name>.repository.ts` | Database queries         |
+| `src/api/<name>/<name>.service.ts`    | Business logic           |
+| `src/api/<name>/<name>.controller.ts` | Request handlers         |
+| `src/api/<name>/<name>.doc.ts`        | OpenAPI documentation    |
+| `src/api/<name>/index.ts`             | Route definitions        |
 
 Registration steps:
 
@@ -210,11 +212,11 @@ docker compose ps
 
 Services:
 
-| Service | Port | Purpose |
-|---------|------|---------|
-| postgres | 5432 | PostgreSQL 16 database |
-| redis | 6379 | Redis 7 cache and job queue |
-| backend | 3000 | Application (production build) |
+| Service  | Port | Purpose                        |
+| -------- | ---- | ------------------------------ |
+| postgres | 5432 | PostgreSQL 16 database         |
+| redis    | 6379 | Redis 7 cache and job queue    |
+| backend  | 3000 | Application (production build) |
 
 ## Contributing
 
@@ -223,7 +225,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for git workflow, commit conventions, and
 ## License
 
 [ISC](LICENSE)
-```
+
+````
 
 - [ ] **Step 2: Verify README content matches codebase**
 
@@ -237,7 +240,7 @@ node -e "const p = require('./package.json'); console.log(Object.keys(p.scripts)
 
 # Verify env vars match .env.example
 grep -E "^[A-Z]" .env.example
-```
+````
 
 - [ ] **Step 3: Commit README**
 
@@ -251,13 +254,14 @@ git commit -m "docs: add readme"
 ### Task 2: Create CONTRIBUTING.md
 
 **Files:**
+
 - Create: `CONTRIBUTING.md`
 
 - [ ] **Step 1: Create CONTRIBUTING.md with full content**
 
 Create `CONTRIBUTING.md` at the project root with the following content:
 
-```markdown
+````markdown
 # Contributing
 
 Guidelines for contributing to this project.
@@ -266,14 +270,14 @@ Guidelines for contributing to this project.
 
 ### Branch Naming
 
-| Branch | Purpose | Example |
-|--------|---------|---------|
-| `main` | Production-ready code | Protected |
-| `feature/*` | New features | `feature/add-user-auth` |
-| `fix/*` | Bug fixes | `fix/login-validation` |
-| `refactor/*` | Code improvements | `refactor/user-service` |
-| `docs/*` | Documentation only | `docs/update-readme` |
-| `chore/*` | Build, deps, config | `chore/upgrade-drizzle` |
+| Branch       | Purpose               | Example                 |
+| ------------ | --------------------- | ----------------------- |
+| `main`       | Production-ready code | Protected               |
+| `feature/*`  | New features          | `feature/add-user-auth` |
+| `fix/*`      | Bug fixes             | `fix/login-validation`  |
+| `refactor/*` | Code improvements     | `refactor/user-service` |
+| `docs/*`     | Documentation only    | `docs/update-readme`    |
+| `chore/*`    | Build, deps, config   | `chore/upgrade-drizzle` |
 
 ### Workflow
 
@@ -290,6 +294,7 @@ git add .
 git commit -m "feat(users): add email verification"
 git push -u origin feature/my-feature
 ```
+````
 
 ## Commit Convention
 
@@ -297,27 +302,27 @@ Format: `<type>(<scope>): <description>`
 
 ### Types
 
-| Type | When to Use |
-|------|-------------|
-| `feat` | New feature |
-| `fix` | Bug fix |
+| Type       | When to Use                  |
+| ---------- | ---------------------------- |
+| `feat`     | New feature                  |
+| `fix`      | Bug fix                      |
 | `refactor` | Code change (no feature/fix) |
-| `docs` | Documentation only |
-| `test` | Adding/updating tests |
-| `chore` | Build, config, dependencies |
-| `style` | Formatting (no code change) |
-| `perf` | Performance improvement |
+| `docs`     | Documentation only           |
+| `test`     | Adding/updating tests        |
+| `chore`    | Build, config, dependencies  |
+| `style`    | Formatting (no code change)  |
+| `perf`     | Performance improvement      |
 
 ### Scopes
 
-| Scope | Area |
-|-------|------|
-| `auth` | Authentication module |
-| `users` | Users module |
-| `examples` | Examples module |
-| `core` | Core (errors, responses) |
-| `config` | Configuration |
-| `deps` | Dependencies |
+| Scope      | Area                     |
+| ---------- | ------------------------ |
+| `auth`     | Authentication module    |
+| `users`    | Users module             |
+| `examples` | Examples module          |
+| `core`     | Core (errors, responses) |
+| `config`   | Configuration            |
+| `deps`     | Dependencies             |
 
 ### Examples
 
@@ -366,14 +371,17 @@ feat(users): add profile picture upload
 
 ```markdown
 ## Summary
+
 Brief description of changes.
 
 ## Changes
+
 - Added X
 - Updated Y
 - Fixed Z
 
 ## Testing
+
 - [ ] Unit tests added
 - [ ] Manual testing done
 ```
@@ -382,11 +390,17 @@ Brief description of changes.
 
 - Squash merge to main
 - Delete branch after merge
-```
+
+````
 
 - [ ] **Step 2: Commit CONTRIBUTING.md**
 
 ```bash
 git add CONTRIBUTING.md
 git commit -m "docs: add contributing guide"
+`
+```bash
+git add CONTRIBUTING.md
+git commit -m "docs: add contributing guide"
 ```
+````

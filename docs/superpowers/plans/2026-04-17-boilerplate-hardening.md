@@ -13,6 +13,7 @@
 ## File Structure
 
 **Modify**
+
 - `src/api/auth/auth.service.ts`
   Purpose: enforce refresh-token single use and add a reusable token revocation helper.
 - `src/api/auth/auth.controller.ts`
@@ -39,6 +40,7 @@
   Purpose: align Quick Start, Docker section, CSRF usage, and Bull Board setup with actual behavior.
 
 **Test**
+
 - `src/__tests__/api/auth/auth.e2e.test.ts`
 - `src/__tests__/middlewares/csrf.middleware.test.ts`
 - `src/__tests__/config/feature-flags.test.ts`
@@ -46,6 +48,7 @@
 ### Task 1: Harden Refresh Token Rotation And Logout Revocation
 
 **Files:**
+
 - Modify: `src/api/auth/auth.service.ts:45-117`
 - Modify: `src/api/auth/auth.controller.ts:34-76`
 - Modify: `src/__tests__/api/auth/auth.e2e.test.ts:72-138`
@@ -69,14 +72,24 @@ it('should reject reuse of the same refresh token cookie', async () => {
   const firstRefresh = await request(app)
     .post('/api/v1/auth/refresh-token')
     .set('x-csrf-token', csrf.csrfToken)
-    .set('Cookie', Array.isArray(originalCookie) ? originalCookie.join('; ') : String(originalCookie));
+    .set(
+      'Cookie',
+      Array.isArray(originalCookie)
+        ? originalCookie.join('; ')
+        : String(originalCookie)
+    );
 
   expect(firstRefresh.status).toBe(200);
 
   const replayRefresh = await request(app)
     .post('/api/v1/auth/refresh-token')
     .set('x-csrf-token', csrf.csrfToken)
-    .set('Cookie', Array.isArray(originalCookie) ? originalCookie.join('; ') : String(originalCookie));
+    .set(
+      'Cookie',
+      Array.isArray(originalCookie)
+        ? originalCookie.join('; ')
+        : String(originalCookie)
+    );
 
   expect(replayRefresh.status).toBe(401);
 });
@@ -98,7 +111,9 @@ it('should revoke the refresh token on logout', async () => {
     .set('x-csrf-token', csrf.csrfToken)
     .set(
       'Cookie',
-      Array.isArray(refreshCookie) ? refreshCookie.join('; ') : String(refreshCookie)
+      Array.isArray(refreshCookie)
+        ? refreshCookie.join('; ')
+        : String(refreshCookie)
     );
 
   expect(logoutRes.status).toBe(200);
@@ -108,7 +123,9 @@ it('should revoke the refresh token on logout', async () => {
     .set('x-csrf-token', csrf.csrfToken)
     .set(
       'Cookie',
-      Array.isArray(refreshCookie) ? refreshCookie.join('; ') : String(refreshCookie)
+      Array.isArray(refreshCookie)
+        ? refreshCookie.join('; ')
+        : String(refreshCookie)
     );
 
   expect(refreshAfterLogout.status).toBe(401);
@@ -136,6 +153,7 @@ npx jest src/__tests__/api/auth/auth.e2e.test.ts --runInBand --verbose
 ```
 
 Expected:
+
 - FAIL on refresh-token replay test with `Expected: 401, Received: 200`
 - FAIL on refresh-after-logout test with `Expected: 401, Received: 200`
 
@@ -285,6 +303,7 @@ npx jest src/__tests__/api/auth/auth.e2e.test.ts --runInBand --verbose
 ```
 
 Expected:
+
 - PASS
 - replay test returns 401 on second refresh
 - logout invalidates the original refresh token
@@ -299,6 +318,7 @@ git commit -m "fix(auth): enforce refresh token revocation"
 ### Task 2: Enforce CSRF For Cookie-Based Write Requests
 
 **Files:**
+
 - Modify: `src/middlewares/csrf.middleware.ts:19-31`
 - Modify: `src/__tests__/middlewares/csrf.middleware.test.ts:39-69`
 - Modify: `src/__tests__/api/auth/auth.e2e.test.ts:30-138`
@@ -339,6 +359,7 @@ npx jest src/__tests__/middlewares/csrf.middleware.test.ts src/__tests__/api/aut
 ```
 
 Expected:
+
 - FAIL because `skipCsrfProtection({ headers: {} })` currently returns `true`
 - Existing login tests may also fail until they are updated to send CSRF token and cookie
 
@@ -394,7 +415,12 @@ The refresh happy path should follow the same pattern, but use the refresh cooki
 const refreshRes = await request(app)
   .post('/api/v1/auth/refresh-token')
   .set('x-csrf-token', csrf.csrfToken)
-  .set('Cookie', Array.isArray(setCookieHeader) ? setCookieHeader.join('; ') : String(setCookieHeader));
+  .set(
+    'Cookie',
+    Array.isArray(setCookieHeader)
+      ? setCookieHeader.join('; ')
+      : String(setCookieHeader)
+  );
 ```
 
 - [x] **Step 5: Run the CSRF and auth suites**
@@ -406,6 +432,7 @@ npx jest src/__tests__/middlewares/csrf.middleware.test.ts src/__tests__/api/aut
 ```
 
 Expected:
+
 - PASS
 - login without CSRF returns 403
 - login/refresh/logout with CSRF bootstrap flow still pass
@@ -420,6 +447,7 @@ git commit -m "fix(auth): require csrf for cookie requests"
 ### Task 3: Make Bull Board Secure By Default
 
 **Files:**
+
 - Modify: `src/config/env.schema.ts:42-43`
 - Modify: `src/config/env.config.ts:35-77`
 - Modify: `src/app.ts:85-111`
@@ -452,6 +480,7 @@ npx jest src/__tests__/config/feature-flags.test.ts --runInBand --verbose
 ```
 
 Expected:
+
 - FAIL because env schema currently defaults both values to `'admin'`
 
 - [x] **Step 3: Remove insecure defaults and gate route mounting**
@@ -587,6 +616,7 @@ npx jest src/__tests__/config/feature-flags.test.ts --runInBand --verbose
 ```
 
 Expected:
+
 - PASS
 - no default `admin/admin` behavior remains in config parsing
 
@@ -600,6 +630,7 @@ git commit -m "fix(config): remove insecure bull board defaults"
 ### Task 4: Align Dev Docker Compose With README Quick Start
 
 **Files:**
+
 - Modify: `docker-compose.yml:44-63`
 - Modify: `README.md:23-45,165-187`
 - Modify: `.env.example:8-20`
@@ -613,6 +644,7 @@ docker compose config --services
 ```
 
 Expected current output:
+
 - includes `backend`
 - this conflicts with README Quick Start, which tells users to run `npm run docker:up` and then `npm run dev` locally
 
@@ -628,7 +660,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-admin}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password123}
-      POSTGRES_DB: ${POSTGRES_DB:-backend-template}
+      POSTGRES_DB: ${POSTGRES_DB:-express-typescript-boilerplate}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -637,7 +669,7 @@ services:
       test:
         [
           'CMD-SHELL',
-          'pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-backend-template}',
+          'pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-express-typescript-boilerplate}',
         ]
       interval: 10s
       timeout: 5s
@@ -668,26 +700,30 @@ Update `README.md` Quick Start to explicitly say infra-only Docker, then app run
 
 ```md
 # Start PostgreSQL and Redis only
+
 npm run docker:up
 
 # Install dependencies
+
 npm install
 
 # Push database schema and seed
+
 npm run db:push
 npm run seed:dev
 
 # Start the API locally
+
 npm run dev
 ```
 
 Update the Docker section service table to remove `backend` from local Compose:
 
 ```md
-| Service | Port | Purpose |
-|---------|------|---------|
-| postgres | 5432 | PostgreSQL 16 database |
-| redis | 6379 | Redis 7 cache and job queue |
+| Service  | Port | Purpose                     |
+| -------- | ---- | --------------------------- |
+| postgres | 5432 | PostgreSQL 16 database      |
+| redis    | 6379 | Redis 7 cache and job queue |
 ```
 
 Add one sentence below:
@@ -701,7 +737,7 @@ The development Compose file starts infrastructure only. Run the API itself with
 Keep these values as local-host defaults in `.env.example`:
 
 ```dotenv
-DATABASE_URL=postgresql://admin:password123@localhost:5432/backend-template
+DATABASE_URL=postgresql://admin:password123@localhost:5432/express-typescript-boilerplate
 REDIS_URL=redis://localhost:6379
 ```
 
@@ -721,6 +757,7 @@ docker compose config --services
 ```
 
 Expected:
+
 - output contains only `postgres` and `redis`
 
 Run:
@@ -730,6 +767,7 @@ npm run lint
 ```
 
 Expected:
+
 - PASS
 
 - [x] **Step 6: Commit**
@@ -742,6 +780,7 @@ git commit -m "docs: align local docker quick start"
 ### Task 5: Final Verification
 
 **Files:**
+
 - Test only, no code changes expected
 
 - [x] **Step 1: Run focused regression suites**
@@ -753,6 +792,7 @@ npx jest src/__tests__/api/auth/auth.e2e.test.ts src/__tests__/middlewares/csrf.
 ```
 
 Expected:
+
 - PASS
 
 - [x] **Step 2: Run full test suite**
@@ -764,6 +804,7 @@ npm test
 ```
 
 Expected:
+
 - PASS
 
 - [x] **Step 3: Run lint**
@@ -775,6 +816,7 @@ npm run lint
 ```
 
 Expected:
+
 - PASS
 
 - [x] **Step 4: Review the diff before handing off**
@@ -786,6 +828,7 @@ git diff -- src/api/auth/auth.service.ts src/api/auth/auth.controller.ts src/mid
 ```
 
 Expected:
+
 - only the planned auth, CSRF, config, compose, and doc changes appear
 
 - [x] **Step 5: Create the final commit**
@@ -798,6 +841,7 @@ git commit -m "fix(auth): harden boilerplate security defaults"
 ## Self-Review
 
 **Spec coverage**
+
 - Refresh token replay fixed: Task 1
 - Logout revokes refresh token: Task 1
 - CSRF bypass removed: Task 2
@@ -806,10 +850,35 @@ git commit -m "fix(auth): harden boilerplate security defaults"
 - Missing regression tests addressed: Tasks 1, 2, 3, 5
 
 **Placeholder scan**
+
 - No `TODO`, `TBD`, or “write tests for above” placeholders remain.
 - Every task includes concrete file paths, commands, expected outcomes, and code snippets.
 
 **Type consistency**
+
+```bash
+git add src/api/auth/auth.service.ts src/api/auth/auth.controller.ts src/middlewares/csrf.middleware.ts src/config/env.schema.ts src/config/env.config.ts src/app.ts src/__tests__/api/auth/auth.e2e.test.ts src/__tests__/middlewares/csrf.middleware.test.ts src/__tests__/config/feature-flags.test.ts src/__tests__/helpers.ts docker-compose.yml README.md .env.example
+git commit -m "fix(auth): harden boilerplate security defaults"
+```
+
+## Self-Review
+
+**Spec coverage**
+
+- Refresh token replay fixed: Task 1
+- Logout revokes refresh token: Task 1
+- CSRF bypass removed: Task 2
+- Bull Board insecure defaults removed: Task 3
+- Docker/README onboarding mismatch fixed: Task 4
+- Missing regression tests addressed: Tasks 1, 2, 3, 5
+
+**Placeholder scan**
+
+- No `TODO`, `TBD`, or “write tests for above” placeholders remain.
+- Every task includes concrete file paths, commands, expected outcomes, and code snippets.
+
+**Type consistency**
+
 - `revokeToken(token, expectedType)` is defined in Task 1 and reused consistently in the controller.
 - `getCsrfSession()` is defined in Task 1 and reused in Task 2.
 - `config.bullBoard.username/password` are defined in Task 3 and used consistently in `app.ts`.
