@@ -118,3 +118,86 @@ registry.registerPath({
     },
   },
 });
+
+// POST /auth/forgot-password
+registry.registerPath({
+  method: 'post',
+  path: '/auth/forgot-password',
+  tags: ['Auth'],
+  summary: 'Request password reset link',
+  description:
+    'Sends an email with a password reset link if the email is registered.',
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: forgotPasswordSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Reset instructions sent',
+      content: {
+        'application/json': {
+          schema: baseSuccessSchema.extend({
+            message: z.string().openapi({
+              example:
+                'If that email is registered, you will receive a password reset link shortly.',
+            }),
+          }),
+        },
+      },
+    },
+    400: {
+      description: 'Invalid email format',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+// POST /auth/reset-password
+registry.registerPath({
+  method: 'post',
+  path: '/auth/reset-password',
+  tags: ['Auth'],
+  summary: 'Reset password using token',
+  description:
+    'Resets the password for the user matching the provided valid token.',
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: resetPasswordSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Password reset successful',
+      content: {
+        'application/json': {
+          schema: baseSuccessSchema.extend({
+            message: z
+              .string()
+              .openapi({ example: 'Password reset successfully' }),
+          }),
+        },
+      },
+    },
+    400: {
+      description: 'Invalid or expired token, or invalid password format',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+});
