@@ -293,9 +293,10 @@ describe('Auth API (E2E)', () => {
     });
 
     it('should successfully reset the password with a valid token', async () => {
-      const passwordResetTokenService = container.get<any>(
-        TOKENS.PasswordResetTokenService
-      );
+      const passwordResetTokenService =
+        container.get<PasswordResetTokenService>(
+          TOKENS.PasswordResetTokenService
+        );
       const userRes = await request(app)
         .post('/api/v1/auth/login')
         .set('x-csrf-token', csrf.csrfToken)
