@@ -6,8 +6,8 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Database & Token Management' (Protocol in workflow.md) 821ec1c
 
 ## Phase 2: Forgot Password Request (Email Generation)
-- [ ] Task: Write Tests for Forgot Password Endpoint
-- [ ] Task: Implement Forgot Password Controller and Service
+- [x] Task: Write Tests for Forgot Password Endpoint 182cd21
+- [~] Task: Implement Forgot Password Controller and Service
 - [ ] Task: Write Tests for Email Queue Worker
 - [ ] Task: Implement Email Queue Worker (BullMQ) for Reset Link
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Forgot Password Request (Email Generation)' (Protocol in workflow.md)
