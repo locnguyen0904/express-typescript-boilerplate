@@ -10,7 +10,7 @@ To provide a highly robust, developer-friendly backend foundation that accelerat
 - **Internal Development Teams:** Built primarily for the author and their team to streamline new project spin-ups, ensuring consistency and high quality across all deployments.
 
 ## Core Value Propositions
-- **Out-of-box Security:** Comprehensive security measures including JWT authentication, CSRF protection, Helmet, and Redis-backed rate limiting, all configured out of the box.
+- **Out-of-box Security:** Comprehensive security measures including JWT authentication, a secure password reset flow, CSRF protection, Helmet, and Redis-backed rate limiting, all configured out of the box.
 - **Exceptional Developer Experience:** End-to-end type safety with TypeScript and Zod, automated OpenAPI documentation generation, robust dependency injection via Inversify, and a fully Dockerized local environment.
 - **Performance and Scalability:** High-performance data layer powered by PostgreSQL and Drizzle ORM, augmented with Redis caching and asynchronous background job processing via BullMQ.
 
