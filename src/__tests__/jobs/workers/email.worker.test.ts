@@ -4,7 +4,9 @@ import * as index from '@/jobs/index';
 import {
   closeEmailWorker,
   createEmailWorker,
+  processEmail,
 } from '@/jobs/workers/email.worker';
+import { logger } from '@/services';
 
 jest.mock('bullmq', () => ({
   Worker: jest.fn().mockImplementation(() => ({
@@ -21,6 +23,31 @@ describe('EmailWorker', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (index.getRedisConnection as jest.Mock).mockReturnValue(mockRedisClient);
+  });
+
+  describe('processEmail', () => {
+    it('should process the email job and log the email body including the reset link', async () => {
+      const job = {
+        data: {
+          to: 'test@example.com',
+          subject: 'Reset Password',
+          body: 'Reset link here',
+        },
+      } as any;
+
+      const loggerSpy = jest.spyOn(logger, 'info').mockImplementation();
+
+      await processEmail(job);
+
+      expect(loggerSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Sending email to=test@example.com')
+      );
+      expect(loggerSpy).toHaveBeenCalledWith(
+        expect.stringContaining('body="Reset link here"')
+      );
+
+      loggerSpy.mockRestore();
+    });
   });
 
   describe('createEmailWorker', () => {
