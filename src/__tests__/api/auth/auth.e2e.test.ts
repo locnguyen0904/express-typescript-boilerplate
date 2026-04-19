@@ -232,4 +232,40 @@ describe('Auth API (E2E)', () => {
       expect(refreshAfterLogout.status).toBe(401);
     });
   });
+
+  // ──────────────── FORGOT PASSWORD ────────────────
+
+  describe('POST /api/v1/auth/forgot-password', () => {
+    it('should return 200 with a success message for a valid email', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/forgot-password')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader)
+        .send({ email: TEST_ADMIN.email });
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toContain('If that email is registered');
+    });
+
+    it('should return 400 for an invalid email format', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/forgot-password')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader)
+        .send({ email: 'invalid-email' });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 200 even for an unregistered email to prevent email enumeration', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/forgot-password')
+        .set('x-csrf-token', csrf.csrfToken)
+        .set('Cookie', csrf.cookieHeader)
+        .send({ email: 'nonexistent@example.com' });
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toContain('If that email is registered');
+    });
+  });
 });
