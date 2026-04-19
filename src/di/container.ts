@@ -9,6 +9,7 @@ import UserController from '@/api/users/user.controller';
 import { UserRepository } from '@/api/users/user.repository';
 import UserService from '@/api/users/user.service';
 import EventService from '@/services/event.service';
+import PasswordResetTokenService from '@/services/password-reset-token.service';
 import RedisService from '@/services/redis.service';
 import TokenBlacklistService from '@/services/token-blacklist.service';
 
@@ -51,6 +52,10 @@ container
 container
   .bind<TokenBlacklistService>(TOKENS.TokenBlacklistService)
   .to(TokenBlacklistService)
+  .inSingletonScope();
+container
+  .bind<PasswordResetTokenService>(TOKENS.PasswordResetTokenService)
+  .to(PasswordResetTokenService)
   .inSingletonScope();
 
 // Repositories

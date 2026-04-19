@@ -3,6 +3,7 @@ export const TOKENS = {
   RedisService: Symbol.for('RedisService'),
   EventService: Symbol.for('EventService'),
   TokenBlacklistService: Symbol.for('TokenBlacklistService'),
+  PasswordResetTokenService: Symbol.for('PasswordResetTokenService'),
 
   // Repositories
   UserRepository: Symbol.for('UserRepository'),
