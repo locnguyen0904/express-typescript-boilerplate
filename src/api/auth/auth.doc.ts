@@ -7,7 +7,11 @@ import {
 } from '@/common';
 import { registry } from '@/config/openapi.config';
 
-import { loginSchema } from './auth.validation';
+import {
+  forgotPasswordSchema,
+  loginSchema,
+  resetPasswordSchema,
+} from './auth.validation';
 
 const tokenResponseSchema = z.object({
   token: z
