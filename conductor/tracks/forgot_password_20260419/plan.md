@@ -15,5 +15,5 @@
 ## Phase 3: Password Reset Execution
 - [x] Task: Write Tests for Reset Password Endpoint f053d93
 - [x] Task: Implement Reset Password Controller and Service (Token Validation & Password Update) 9b00856
-- [ ] Task: Update OpenAPI Documentation for New Endpoints
+- [x] Task: Update OpenAPI Documentation for New Endpoints 603c3f8
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Password Reset Execution' (Protocol in workflow.md)
