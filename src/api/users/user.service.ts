@@ -56,10 +56,6 @@ export default class UserService {
     return this.userRepository.findByEmail(email);
   }
 
-  async findByEmailWithPassword(email: string): Promise<IUser | null> {
-    return this.userRepository.findByEmailWithPassword(email);
-  }
-
   async getOrFail(id: string): Promise<IUser> {
     const user = await this.userRepository.findById(id);
     if (!user) {

@@ -13,7 +13,6 @@ process.env.ADMIN_EMAIL = 'admin@test.local';
 process.env.ADMIN_PASSWORD = 'password123';
 process.env.NODE_ENV = 'test';
 process.env.PORT = '3000';
-process.env.ENCRYPTION_KEY = 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4'; // 32 hex chars for AES-256
 
 // ──────────────────────────────────────────────
 // GLOBAL MOCKS: Only infrastructure that is

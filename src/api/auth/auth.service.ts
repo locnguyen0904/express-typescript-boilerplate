@@ -27,7 +27,7 @@ export default class AuthService {
   ) {}
 
   async forgotPassword(email: string): Promise<void> {
-    const user = await this.userService.findByEmailWithPassword(email);
+    const user = await this.userService.findByEmail(email);
     if (!user) {
       // Return immediately to prevent email enumeration
       return;
@@ -60,7 +60,7 @@ export default class AuthService {
     email: string,
     password: string
   ): Promise<{ user: IUser; tokens: AuthTokens }> {
-    const user = await this.userService.findByEmailWithPassword(email);
+    const user = await this.userService.findByEmail(email);
     if (!user || !(await this.verifyPassword(user, password))) {
       throw new UnAuthorizedError('Incorrect email or password');
     }

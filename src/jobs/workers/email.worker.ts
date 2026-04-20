@@ -8,11 +8,12 @@ import { EmailJobData } from '../queues/email.queue';
 let emailWorker: Worker<EmailJobData> | null = null;
 
 export async function processEmail(job: Job<EmailJobData>): Promise<void> {
-  const { to, subject, body } = job.data;
+  const { to, subject } = job.data;
 
-  // TODO: Replace with actual email sending logic (e.g., nodemailer, SendGrid, SES)
+  // TODO: Implement actual email sending (e.g., nodemailer, SendGrid, SES).
+  // Currently logs the email data for debugging. No email is sent.
   logger.info(
-    `[Email Worker] Sending email to=${to} subject="${subject}" body="${body}"`
+    `[Email Worker] Placeholder — email not sent. to=${to} subject="${subject}"`
   );
 
   // Simulate email sending delay

@@ -56,14 +56,6 @@ export class UserRepository {
     return result ?? null;
   }
 
-  async findByEmailWithPassword(email: string): Promise<IUser | null> {
-    const [result] = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email));
-    return result ?? null;
-  }
-
   async isEmailTaken(email: string, excludeUserId?: string): Promise<boolean> {
     const [result] = await db
       .select({ id: users.id })

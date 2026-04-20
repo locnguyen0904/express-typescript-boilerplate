@@ -27,7 +27,9 @@ const envSchema = z.object({
   JWT_REFRESH_EXPIRATION_DAYS: z.coerce.number().int().positive().default(30),
   ADMIN_NAME: z.string().default('Super Admin'),
   ADMIN_EMAIL: z.email().default('admin@example.com'),
-  ADMIN_PASSWORD: z.string().default('password123'),
+  ADMIN_PASSWORD: z
+    .string()
+    .min(8, 'ADMIN_PASSWORD must be at least 8 characters'),
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_CLIENT_EMAIL: z.string().optional(),
   FIREBASE_PRIVATE_KEY: z.string().optional(),
