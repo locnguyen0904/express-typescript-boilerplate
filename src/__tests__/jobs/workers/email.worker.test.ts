@@ -26,7 +26,7 @@ describe('EmailWorker', () => {
   });
 
   describe('processEmail', () => {
-    it('should process the email job and log the email body including the reset link', async () => {
+    it('should process the email job and log the email data as placeholder', async () => {
       const job = {
         data: {
           to: 'test@example.com',
@@ -40,10 +40,13 @@ describe('EmailWorker', () => {
       await processEmail(job);
 
       expect(loggerSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Sending email to=test@example.com')
+        expect.stringContaining('Placeholder — email not sent')
       );
       expect(loggerSpy).toHaveBeenCalledWith(
-        expect.stringContaining('body="Reset link here"')
+        expect.stringContaining('to=test@example.com')
+      );
+      expect(loggerSpy).toHaveBeenCalledWith(
+        expect.stringContaining('subject="Reset Password"')
       );
 
       loggerSpy.mockRestore();
